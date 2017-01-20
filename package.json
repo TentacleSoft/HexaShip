@@ -5,7 +5,8 @@
   "license": "MIT",
   "version": "1.0.0",
   "engines": {
-    "node": "7.3.0"
+    "node": "7.3.0",
+    "npm": "4.1.2"
   },
   "main": "app.js",
   "scripts": {
