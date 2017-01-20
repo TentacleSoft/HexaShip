@@ -4,6 +4,9 @@
   "description": "An article and demo explaining how multiplayer games work, with a demo in HTML5 using socket.io, node.js and canvas.",
   "license": "MIT",
   "version": "1.0.0",
+  "engines": {
+    "node": "7.3.0"
+  },
   "main": "app.js",
   "scripts": {
       "start": "node app.js"
