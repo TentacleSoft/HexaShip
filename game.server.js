@@ -9,7 +9,7 @@
  */
 
 var
-    game_server = module.exports = {games: {}, game_count: 0},
+    game_server = module.exports = { games: {}, game_count: 0 },
     UUID = require('uuid'),
     verbose = true;
 
@@ -44,7 +44,7 @@ game_server.onMessage = function (client, message) {
     if (this.fake_latency && message.split('.')[0].substr(0, 1) === 'i') {
 
         //store all input message
-        game_server.messages.push({client: client, message: message});
+        game_server.messages.push({ client: client, message: message });
 
         setTimeout(function () {
             if (game_server.messages.length) {

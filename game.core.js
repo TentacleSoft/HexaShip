@@ -19,7 +19,7 @@
 // fixes from Paul Irish and Tino Zijdel
 
 var frame_time = 60 / 1000; // run the local game at 16ms/ 60hz
-if ("undefined" !== typeof(global)) {
+if ("undefined" !== typeof (global)) {
     frame_time = 45;
 } //on server we run at 45ms, 22hz
 
@@ -36,7 +36,7 @@ if ("undefined" !== typeof(global)) {
     if (!window.requestAnimationFrame) {
         window.requestAnimationFrame = function (callback, element) {
             var currTime = Date.now();
-            var timeToCall = Math.max(0, frame_time - ( currTime - lastTime ));
+            var timeToCall = Math.max(0, frame_time - (currTime - lastTime));
             var id = window.setTimeout(function () {
                 callback(currTime + timeToCall);
             }, timeToCall);
@@ -51,7 +51,7 @@ if ("undefined" !== typeof(global)) {
         };
     }
 
-}() );
+} ());
 
 //Now the main game class. This gets created on
 //both server and client. Server creates one for
@@ -81,8 +81,7 @@ var game_core = function (game_instance) {
             other: new game_player(this, this.instance.player_client)
         };
 
-        this.players.self.pos = {x: 20, y: 20};
-
+        this.players.self.pos = { x: 20, y: 20 };
     } else {
 
         this.players = {
@@ -110,9 +109,9 @@ var game_core = function (game_instance) {
         this.ghosts.server_pos_self.state = "server_pos";
         this.ghosts.server_pos_other.state = "server_pos";
 
-        this.ghosts.server_pos_self.pos = {x: 20, y: 20};
-        this.ghosts.pos_other.pos = {x: 500, y: 200};
-        this.ghosts.server_pos_other.pos = {x: 500, y: 200};
+        this.ghosts.server_pos_self.pos = { x: 20, y: 20 };
+        this.ghosts.pos_other.pos = { x: 500, y: 200 };
+        this.ghosts.server_pos_other.pos = { x: 500, y: 200 };
     }
 
     //The speed at which the clients move.
@@ -192,19 +191,19 @@ Number.prototype.fixed = function (n) {
 };
 //copies a 2d vector like object from one to another
 game_core.prototype.pos = function (a) {
-    return {x: a.x, y: a.y};
+    return { x: a.x, y: a.y };
 };
 //Add a 2d vector with another one and return the resulting vector
 game_core.prototype.v_add = function (a, b) {
-    return {x: (a.x + b.x).fixed(), y: (a.y + b.y).fixed()};
+    return { x: (a.x + b.x).fixed(), y: (a.y + b.y).fixed() };
 };
 //Subtract a 2d vector with another one and return the resulting vector
 game_core.prototype.v_sub = function (a, b) {
-    return {x: (a.x - b.x).fixed(), y: (a.y - b.y).fixed()};
+    return { x: (a.x - b.x).fixed(), y: (a.y - b.y).fixed() };
 };
 //Multiply a 2d vector with a scalar value and return the resulting vector
 game_core.prototype.v_mul_scalar = function (a, b) {
-    return {x: (a.x * b).fixed(), y: (a.y * b).fixed()};
+    return { x: (a.x * b).fixed(), y: (a.y * b).fixed() };
 };
 //For the server, we need to cancel the setTimeout that the polyfill creates
 game_core.prototype.stop_update = function () {
@@ -218,7 +217,7 @@ game_core.prototype.lerp = function (p, n, t) {
 };
 //Simple linear interpolation between 2 vectors
 game_core.prototype.v_lerp = function (v, tv, t) {
-    return {x: this.lerp(v.x, tv.x, t), y: this.lerp(v.y, tv.y, t)};
+    return { x: this.lerp(v.x, tv.x, t), y: this.lerp(v.y, tv.y, t) };
 };
 
 /*
@@ -235,16 +234,16 @@ var game_player = function (game_instance, player_instance) {
     this.game = game_instance;
 
     //Set up initial values for our state information
-    this.pos = {x: 0, y: 0};
-    this.size = {x: 16, y: 16, hx: 8, hy: 8};
+    this.pos = { x: 0, y: 0 };
+    this.size = { x: 16, y: 16, hx: 8, hy: 8 };
     this.state = "not-connected";
     this.color = "rgba(255,255,255,0.1)";
     this.info_color = "rgba(255,255,255,0.1)";
     this.id = "";
 
     //These are used in moving us around later
-    this.old_state = {pos: {x: 0, y: 0}};
-    this.cur_state = {pos: {x: 0, y: 0}};
+    this.old_state = { pos: { x: 0, y: 0 } };
+    this.cur_state = { pos: { x: 0, y: 0 } };
     this.state_time = new Date().getTime();
 
     //Our local history of inputs
@@ -262,9 +261,9 @@ var game_player = function (game_instance, player_instance) {
     //the server already knows who they are. If the server starts a game
     //with only a host, the other player is set up in the "else" below
     if (player_instance) {
-        this.pos = {x: 20, y: 20};
+        this.pos = { x: 20, y: 20 };
     } else {
-        this.pos = {x: 500, y: 200};
+        this.pos = { x: 500, y: 200 };
     }
 
 }; //game_player.constructor
@@ -297,7 +296,7 @@ game_player.prototype.draw = function () {
 game_core.prototype.update = function (t) {
 
     //Work out the delta time
-    this.dt = this.lastframetime ? ( (t - this.lastframetime) / 1000.0).fixed() : 0.016;
+    this.dt = this.lastframetime ? ((t - this.lastframetime) / 1000.0).fixed() : 0.016;
 
     //Store the last frame time
     this.lastframetime = t;
@@ -486,7 +485,7 @@ game_core.prototype.handle_server_input = function (client, input, input_time, i
             this.players.self : this.players.other;
 
     //Store the input on the player instance for processing in the physics loop
-    player_client.inputs.push({inputs: input, time: input_time, seq: input_seq});
+    player_client.inputs.push({ inputs: input, time: input_time, seq: input_seq });
 
 }; //game_core.handle_server_input
 
@@ -573,7 +572,7 @@ game_core.prototype.client_handle_input = function () {
 
     } else {
 
-        return {x: 0, y: 0};
+        return { x: 0, y: 0 };
 
     }
 
@@ -782,7 +781,7 @@ game_core.prototype.client_onserverupdate_recieved = function (data) {
 
         //we limit the buffer in seconds worth of updates
         //60fps*buffer seconds = number of samples
-        if (this.server_updates.length >= ( 60 * this.buffer_size )) {
+        if (this.server_updates.length >= (60 * this.buffer_size)) {
             this.server_updates.splice(0, 1);
         }
 
@@ -1015,8 +1014,8 @@ game_core.prototype.client_reset_positions = function () {
     var player_client = this.players.self.host ? this.players.other : this.players.self;
 
     //Host always spawns at the top left.
-    player_host.pos = {x: 20, y: 20};
-    player_client.pos = {x: 500, y: 200};
+    player_host.pos = { x: 20, y: 20 };
+    player_client.pos = { x: 500, y: 200 };
 
     //Make sure the local player physics is updated
     this.players.self.old_state.pos = this.pos(this.players.self.pos);
@@ -1127,27 +1126,27 @@ game_core.prototype.client_onnetmessage = function (data) {
 
             switch (subcommand) {
 
-                case "h" : //host a game requested
+                case "h": //host a game requested
                     this.client_onhostgame(commanddata);
                     break;
 
-                case "j" : //join a game requested
+                case "j": //join a game requested
                     this.client_onjoingame(commanddata);
                     break;
 
-                case "r" : //ready a game requested
+                case "r": //ready a game requested
                     this.client_onreadygame(commanddata);
                     break;
 
-                case "e" : //end game requested
+                case "e": //end game requested
                     this.client_ondisconnect(commanddata);
                     break;
 
-                case "p" : //server ping
+                case "p": //server ping
                     this.client_onping(commanddata);
                     break;
 
-                case "c" : //other player changed colors
+                case "c": //other player changed colors
                     this.client_on_otherclientcolorchange(commanddata);
                     break;
 

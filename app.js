@@ -36,7 +36,7 @@ http.listen(gameport, function () {
 //By default, we forward the / path to index.html automatically.
 app.get('/', function (req, res) {
     console.log('trying to load %s', __dirname + '/index.html');
-    res.sendfile('/index.html', {root: __dirname});
+    res.sendfile('/index.html', { root: __dirname });
 });
 
 
@@ -81,7 +81,7 @@ io.on('connection', function (client) {
     client.userid = UUID();
 
     //tell the player they connected, giving them their id
-    client.emit('onconnected', {id: client.userid});
+    client.emit('onconnected', { id: client.userid });
 
     //now we can find them a game to play with someone.
     //if no game exists with someone waiting, they create one and wait.
