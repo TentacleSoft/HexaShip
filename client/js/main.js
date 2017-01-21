@@ -15,8 +15,15 @@ const OFFSET_Y = CANVAS_HEIGHT/2;
 var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
     function preload () {
+
+        //game assets
         game.load.image('cell', '../assets/hexagon_border.png');
         game.load.image('redship', '../assets/ship1.png');
+
+        //UI assets
+        game.load.image('button', '../assets/button.png');
+        game.load.image('button_pressed', '../assets/button_pressed.png');
+        game.load.image('misile_button', '../assets/misile_button.png');
 
         // TODO give attribution notice for Ivan Voirol : http://opengameart.org/content/basic-map-32x32-by-silver-iv
         game.load.spritesheet('beach', 'assets/beachmap.png', 32, 32);
@@ -74,6 +81,9 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
               background[i][j].animations.play('water');
           }
       }
+    }
+
+    function createUI() {
     }
 
     function update () {
