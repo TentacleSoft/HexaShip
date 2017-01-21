@@ -52,6 +52,10 @@ io.on('connection',function (socket) {
         sendingShoots();
     });*/
 
+    socket.on('disconnect', function () {
+        console.log('Disconnected: ' + socket.id);
+        delete players[socket.id];
+    });
 });
 
 var sendTurn = function () {
