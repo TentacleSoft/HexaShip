@@ -62,7 +62,6 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
 				cell.scale.setTo(SCALE);
 				setAnchorMid(cell);
 				newCell = newCell.move_towards(Orientation.D,1);
-				console.log(newCell.stringify());
 			}
 			topCell = topCell.move_towards(Orientation.UR,1);
 		}
@@ -79,7 +78,6 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
 				cell.scale.setTo(SCALE);
 				setAnchorMid(cell);
 				newCell = newCell.move_towards(Orientation.D,1);
-				console.log(newCell.stringify());
 			}
 			topCell = topCell.move_towards(Orientation.DR,1);
 		}
