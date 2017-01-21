@@ -20,9 +20,13 @@ app.get('/*', function (req, res, next) {
     res.sendFile(__dirname + '/client/' + file);
 });
 
+var players = [];
+
 io.on('connection',function (socket) {
     console.log('Connected: ' + socket.id);
     // players[socket.id] = new Player (socket);
+
+    players.append(new Player(new HexPosition(0, 0, 0), socket));
 
     socket.emit('onconnected', {id: socket.id});
 
@@ -44,3 +48,11 @@ io.on('connection',function (socket) {
     });*/
 
 });
+
+var sendTurn = function () {
+    players.forEach(function (player) {
+        player.socket.emit('gamestate', {players: players});
+    });
+};
+
+setInterval(sendTurn, 1000);

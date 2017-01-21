@@ -43,8 +43,8 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
     }
 
     var cursors;
-    var player;
     var ship;
+    var shipSprite;
 
     function create () {
         //createBackground();
@@ -85,11 +85,11 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
 		}
 
         //get position from server
-        player = new Player(0,0);
+        ship = new Ship(0, 0, 0);
 
-        ship = game.add.sprite(0, 0, 'redship');
-        ship.scale.setTo(SCALE);
-    		setAnchorMid(ship);
+        shipSprite = game.add.sprite(0, 0, 'redship');
+        shipSprite.scale.setTo(SCALE);
+    		setAnchorMid(shipSprite);
 		cursors = game.input.keyboard.createCursorKeys();
     }
 
@@ -128,35 +128,35 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
     	if (cursors.up.isDown)
         {
 			socket.emit("move",Orientation.U);
-			player.move_towards(Orientation.U)
-			player.setOrientation(Orientation.U);
+			ship.move_towards(Orientation.U)
+			ship.setOrientation(Orientation.U);
         }
         else if (cursors.right.isDown)
         {
 			socket.emit("move",Orientation.UR);
-			player.move_towards(Orientation.UR)
-			player.setOrientation(Orientation.UR)
+			ship.move_towards(Orientation.UR)
+			ship.setOrientation(Orientation.UR)
         }
         else if (cursors.left.isDown)
         {
 			socket.emit("move",Orientation.DL);
-			player.move_towards(Orientation.DL)
-			player.setOrientation(Orientation.DL);
+			ship.move_towards(Orientation.DL)
+			ship.setOrientation(Orientation.DL);
         }
 		else if (cursors.down.isDown)
 		{
 			socket.emit("move",Orientation.D);
-			player.move_towards(Orientation.D)
-			player.setOrientation(Orientation.D);
+			ship.move_towards(Orientation.D)
+			ship.setOrientation(Orientation.D);
 		}
 
 
         //render players
-        let player2dposition = player.getPosition().position2d();
+        let player2dposition = ship.getPosition().position2d();
         let player_pixel_positions = position2dToPixels2(player2dposition.x, player2dposition.y);
-        ship.x = player_pixel_positions.x;
-        ship.y = player_pixel_positions.y;
-        ship.angle = (player.getOrientation()-1)* 60;
+        shipSprite.x = player_pixel_positions.x;
+        shipSprite.y = player_pixel_positions.y;
+        shipSprite.angle = (ship.getOrientation()-1)* 60;
 
     }
 
