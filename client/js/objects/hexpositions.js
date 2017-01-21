@@ -10,6 +10,9 @@ let Orientation = {
     None: 0
 };
 
+var MAX_WIDTH = 9;
+var MAX_HEIGHT = 4;
+
 function turn_right(orientation,factor){
     let new_orientation = orientation + factor;
     while(new_orientation > 6){
@@ -142,9 +145,16 @@ class HexPosition {
         let hexPosition = HexPosition.unitary_vector(orientation);
         hexPosition = hexPosition.product(distance);
 
-        return hexPosition.add(this);
 
-    }
+
+        let newPosition = hexPosition.add(this);
+		if(newPosition.within_box()){
+		    return newPosition;
+        }
+        return this;
+
+
+	}
     position2d(){
         let downleftUprightDistance = this.x;
         let downleftUprightVector = HexPosition.unitary_vector(Orientation.DL).product(downleftUprightDistance);
@@ -187,6 +197,25 @@ class HexPosition {
 	get_back_side_lines(orientation,length){
 		return [this.get_line_towards(turn_left(orientation,2),length),this.get_line_towards(turn_right(orientation,2),length)];
 	}
+
+	within_box(boardWidth,boardHeight){
+	    let oddColumn = this.x%2 == 1;
+	    let topCell = new HexPosition(0,0,0);
+	    if(oddColumn){
+			topCell = new HexPosition(this.x,-(this.x+1)/2,-(this.x-1)/2);
+        }else{
+			topCell = new HexPosition(this.x,-(this.x)/2,-(this.x)/2);
+        }
+        if(this.x > MAX_WIDTH || this.x < 0){
+            console.log("Too far right or left");
+			return false;
+        }else if(this.straight_orientation_to(topCell)==Orientation.D || this.distance_to(topCell) > MAX_HEIGHT){
+			console.log("Too far down or up");
+			return false;
+        }
+		return true;
+
+    }
 }
 
 
@@ -221,7 +250,11 @@ function test_hexposition(){
                 console.log("Wrong movement!: "+movedHexcosa.x+","+movedHexcosa.y+","+movedHexcosa.z);
             }
         }
-        console.log("canons from  UR of "+hexcosa.stringify()+":");
+
+		console.log("Within box of "+hexcosa.stringify()+":");
+        let withinBox = hexcosa.within_box();
+        /*
+
         hexcosa.get_front_side_lines(Orientation.UR,4).forEach(function(line) {
             console.log("canons:");
 			line.forEach(function(neighbour) {
@@ -229,7 +262,8 @@ function test_hexposition(){
 					console.log(neighbour.stringify());
 				}
 			})
-        })
+        })*/
+
     });
 
 }
