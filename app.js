@@ -35,7 +35,7 @@ io.on('connection',function (socket) {
 
     socket.on('move', function (data) {
         // TODO
-        console.log('Player ' + socket.id + ' wants to move to ' + data.direction);
+        // console.log('Player ' + socket.id + ' wants to move to ' + data.direction);
     });
 
     /*updatePlayers();
