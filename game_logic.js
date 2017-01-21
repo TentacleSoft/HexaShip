@@ -8,6 +8,7 @@ Orientation = {
     None: 0
 }
 
+sin135 = 0.70710678118
 
 class HexPosition {
     constructor(x,y,z) {
@@ -16,7 +17,7 @@ class HexPosition {
         this.z = z;
     }
     unitary_vector(orientation){
-        x = y = z
+        let x = 0, y = 0, z = 0
         switch(orientation) {
             case Orientation.U:
                 x = 0;
@@ -61,10 +62,14 @@ class HexPosition {
         return (Math.abs(this.x - pos.x)+Math.abs(this.y-pos.y)+Math.abs(this.z-pos.z))/2
     }
 
+    cardinality(){
+        let center = new HexPosition(0,0,0)
+        return this.distance_to(center)
+    }
 
     straight_orientation_to(pos) {
         if(!this.is_valid() || !pos.is_valid()){
-            return -1;
+            return Orientation.None;
         }
         if (pos.x == this.x) {
             if (pos.y > this.y) {
@@ -93,28 +98,42 @@ class HexPosition {
             return Orientation.None
         }
     }
+    orientationFromCentre(){
+        let center = new HexPosition(0,0,0)
+        return this.straight_orientation_to(center)
+    }
     //per quan una posició representi un vector, multiplicar resulta en distancia * 2 en la mateixa direcció,
     //incús no-rectes
     product(factor){
-        return new HexPosition(this.x*2,this.y*2,this.z*2)
+        return new HexPosition(this.x*factor,this.y*factor,this.z*factor)
     }
     //es una posicio, però generalment només hauries de sumar vectors
     add(pos){
         return new HexPosition(this.x+pos.x,this.y+pos.y,this.z+pos.z)
     }
+    equals(pos){
+        return this.x == pos.x && this.y == pos.y && this.z == pos.z
+    }
     move_towards(orientation,distance){
-        hexPosition = new HexPosition(this.x,this.y,this.z)
-        dx = dy = dz = 0
+        let hexPosition = this.unitary_vector(orientation)
+        hexPosition = hexPosition.product(distance)
+        return hexPosition.add(this)
 
     }
+    distance2d(){
+        let downleftUprightDistance = this.x
+        let downleftUprightVector = this.unitary_vector(Orientation.DL).product(downleftUprightDistance)
+        let upDownDistance = this.add(downleftUprightVector).cardinality()
+        if(this.orientationFromCentre() == Orientation.D){
+            upDownDistance *= -1
+        }
+        console.log(this.orientationFromCentre())
+        return [downleftUprightDistance*sin135,sin135*downleftUprightDistance-upDownDistance]
+    }
+    stringify(){
+        return "x: "+this.x+", y: "+this.y+", z: "+this.z
+    }
 }
-
-
-
-
-
-
-
 
 
 function test_hexposition(){
@@ -123,16 +142,16 @@ function test_hexposition(){
                 [new HexPosition(-3, 3, 0),new HexPosition(2, 0, -2),5,Orientation.None],
                 [new HexPosition(1, 1, -2),new HexPosition(1, -3, 2),4,Orientation.D],
                 [new HexPosition(-2, 1, 1),new HexPosition(0, 0, 0),2,Orientation.None],
-                [new HexPosition(3, -2, -1),new HexPosition(-1, -2, 1),-1,-1]]
+                [new HexPosition(3, -2, -1),new HexPosition(-1, -2, 1),-1,Orientation.None]]
 
 
     tests.forEach(function(test){
-        hexcosa = test[0]
-        hexcusa = test[1]
-        expected_distance = test[2]
-        expected_orientation = test[3]
-        distance = hexcosa.distance_to(hexcusa)
-        orientation = hexcosa.straight_orientation_to(hexcusa)
+        let hexcosa = test[0]
+        let hexcusa = test[1]
+        let expected_distance = test[2]
+        let expected_orientation = test[3]
+        let distance = hexcosa.distance_to(hexcusa)
+        let orientation = hexcosa.straight_orientation_to(hexcusa)
 
         if(distance != expected_distance){
             console.log("Wrong distance: "+distance)
@@ -141,6 +160,13 @@ function test_hexposition(){
         if(orientation != expected_orientation){
             console.log("Wrong orientation: "+orientation)
         }
+        else if(orientation != Orientation.None){
+            let movedHexcosa = hexcosa.move_towards(orientation,distance)
+            if(!movedHexcosa.equals(hexcusa)){
+                console.log("Wrong movement!: "+movedHexcosa.x+","+movedHexcosa.y+","+movedHexcosa.z)
+            }
+        }
+        console.log(hexcosa.stringify()+"; position 2D: "+hexcosa.distance2d())
     });
 
 }
