@@ -13,7 +13,7 @@ socket.on('gamestate', function( data ) {
 availableWidth = window.innerWidth;
 availableHeight = window.innerHeight;
 
-var canvasRatio = 700 / 400;
+var canvasRatio = 1;
 var canvasHeight = availableHeight;
 var canvasWidth = availableWidth;
 if (availableWidth / availableHeight > canvasRatio) {
@@ -22,7 +22,7 @@ if (availableWidth / availableHeight > canvasRatio) {
     canvasHeight = availableWidth * (1/canvasRatio);
 }
 
-const SCALE = canvasWidth / 1400;
+const SCALE = canvasWidth / 900;
 const OFFSET_X = 100 * SCALE;
 const OFFSET_Y = canvasHeight / 2;
 
@@ -48,7 +48,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     var shipSprite;
 
     function create () {
-        //createBackground();
+        createBackground();
 
 		var max_dist = 4;
 		var topCell = new HexPosition(-max_dist,max_dist,0);
@@ -173,6 +173,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     function position2dToPixels2(hex_x,hex_y){
 		let pix_coords = {};
 		pix_coords.x = SCALE *(Cell.HEIGHT * hex_x) +canvasWidth/2;
-		pix_coords.y = SCALE *(Cell.HEIGHT * hex_y) + canvasHeight/2;
+		pix_coords.y = SCALE *(Cell.HEIGHT * hex_y) + canvasHeight/2 + 50 * SCALE;
 		return pix_coords;
     }
