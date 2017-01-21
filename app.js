@@ -1,5 +1,8 @@
 "use strict";
 
+var Player = require("./client/js/objects/player"),
+    HexPosition = require("./client/js/objects/hexpositions");
+
 var port = process.env.PORT || 3000,
     express = require('express'),
     app = express(),
@@ -26,7 +29,7 @@ io.on('connection',function (socket) {
     console.log('Connected: ' + socket.id);
     // players[socket.id] = new Player (socket);
 
-    players.append(new Player(new HexPosition(0, 0, 0), socket));
+    players.push(new Player(new HexPosition(0, 0, 0), socket));
 
     socket.emit('onconnected', {id: socket.id});
 
@@ -50,9 +53,9 @@ io.on('connection',function (socket) {
 });
 
 var sendTurn = function () {
-    players.forEach(function (player) {
-        player.socket.emit('gamestate', {players: players});
-    });
+    /*for (var i = 0; i < players.length; i++) {
+        players[i].socket.emit('gamestate', {players: players});
+    }*/
 };
 
 setInterval(sendTurn, 1000);
