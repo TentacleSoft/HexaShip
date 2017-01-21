@@ -63,13 +63,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 			movingDown = !movingDown;
         }
 		topCell.move_towards(Orientation.D);
-
-        //get position from server
-        ship = new Ship(0, 0, 0);
-
-        shipSprite = game.add.sprite(0, 0, 'playership');
-        shipSprite.scale.setTo(SCALE);
-    		setAnchorMid(shipSprite);
+        
 		cursors = game.input.keyboard.createCursorKeys();
         createUI();
     }
@@ -131,14 +125,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             //ship.setOrientation(Orientation.D);
 		}
 
-
-        //render players
-        let player2dposition = ship.getPosition().position2d();
-        let player_pixel_positions = position2dToPixels2(player2dposition.x, player2dposition.y);
-        shipSprite.x = player_pixel_positions.x;
-        shipSprite.y = player_pixel_positions.y;
-        shipSprite.angle = (ship.getOrientation()-1)* 60;
-
     }
 
     function setAnchorMid(sprite) {
@@ -181,8 +167,11 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             player_2d_position = position2dToPixels2(player_2d_position.x,player_2d_position.y);
             players[p].sprite.x = player_2d_position.x;
             players[p].sprite.y = player_2d_position.y;
+
+            players[p].sprite.angle = (players[p].orientation - 1) * 60;
         };
     }
+
 
 
 // SOCKET CONNECTION STUFF
@@ -198,17 +187,19 @@ socket.on('gamestate', function( data ) {
 
     //console.log('Received game state', data);
     data.players.forEach( function (player) {
-        let nick = player.nick;
-        if (typeof players[nick] == "undefined") {
-            players[nick] = {};
+        let socketId = player.id;
+        if (typeof players[socketId] == "undefined") {
+            players[socketId] = {};
         }
-        players[nick].team = player.team;
-        players[nick].position = player.position;
-        players[nick].orientation = player.orientation;
+        players[socketId].team = player.team;
+        players[socketId].position = player.position;
+        players[socketId].orientation = player.orientation;
     });
     renderShips();
 });
 
 socket.on('disconnected', function (id) {
     console.log('Que covard! el ' + id + ' s\'ha desconnectat!');
+    players[id].sprite.destroy();
+    delete players[id];
 });
