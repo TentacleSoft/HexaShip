@@ -16,7 +16,7 @@ class OrderQueue {
     }
 
     pop() {
-        return this.orders.unshift();
+        return this.orders.shift();
     }
 }
 
