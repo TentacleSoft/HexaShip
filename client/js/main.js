@@ -128,7 +128,6 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
 
         //render players
         let player2dposition = player.getPosition().position2d();
-        console.log(player2dposition);
         let player_pixel_positions = position2dToPixels2(player2dposition.x, player2dposition.y);
         ship.x = player_pixel_positions.x;
         ship.y = player_pixel_positions.y;
