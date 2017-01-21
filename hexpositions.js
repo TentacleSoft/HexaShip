@@ -1,5 +1,6 @@
+"use strict";
 
-Orientation = {
+let Orientation = {
     U  : 1,
     UR : 2,
     DR : 3,
@@ -15,7 +16,7 @@ class HexPosition {
         this.y = y;
         this.z = z;
     }
-    unitary_vector(orientation){
+    static unitary_vector(orientation){
         let x = 0, y = 0, z = 0;
         switch(orientation) {
             case Orientation.U:
@@ -120,7 +121,7 @@ class HexPosition {
         return this.x == pos.x && this.y == pos.y && this.z == pos.z;
     }
     move_towards(orientation,distance){
-        let hexPosition = this.unitary_vector(orientation);
+        let hexPosition = HexPosition.unitary_vector(orientation);
         hexPosition = hexPosition.product(distance);
 
         return hexPosition.add(this)
@@ -166,7 +167,7 @@ class HexPosition {
 
 
 function test_hexposition(){
-    tests = [   [new HexPosition(3, 0, -3),new HexPosition(1, 0, -1),2,Orientation.DL],
+    let tests = [   [new HexPosition(3, 0, -3),new HexPosition(1, 0, -1),2,Orientation.DL],
                 [new HexPosition(-3, 0, 3),new HexPosition(1, 0, -1),4,Orientation.UR],
                 [new HexPosition(3, -1, -2),new HexPosition(2, -1, -1),1,Orientation.DL],
                 [new HexPosition(-3, 3, 0),new HexPosition(2, 0, -2),5,Orientation.None],
@@ -196,7 +197,7 @@ function test_hexposition(){
                 console.log("Wrong movement!: "+movedHexcosa.x+","+movedHexcosa.y+","+movedHexcosa.z)
             }
         }
-        console.log("line towards UR of "+hexcosa.stringify()+":")
+        console.log("line towards UR of "+hexcosa.stringify()+":");
         hexcosa.get_line_towards(Orientation.UR,4).forEach(function(neighbour) {
             if(neighbour.within_center(3)){
                 console.log(neighbour.stringify())
@@ -207,4 +208,4 @@ function test_hexposition(){
 
 }
 
-test_hexposition()
+test_hexposition();
