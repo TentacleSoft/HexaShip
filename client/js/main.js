@@ -12,7 +12,6 @@ if (availableWidth / availableHeight > canvasRatio) {
 
 const SCALE = canvasWidth / 900;
 const OFFSET_X = 100 * SCALE;
-const OFFSET_Y = canvasHeight / 2;
 
 //Game stuff
 var players = {};
@@ -36,8 +35,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     }
 
     var cursors;
-    var ship;
-    var shipSprite;
 
     function create () {
         createBackground();
@@ -74,10 +71,10 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
           background[i] = [];
           for (j = 0; j <= window.innerHeight/32; ++j) {
               background[i][j] = game.add.sprite(32 * i, j * 32, 'beach')
-              var frames = [];
-              if (i % 3 == 0) {
+              let frames = [];
+              if (i % 3 === 0) {
                   frames = [496, 496, 498];
-              } else if (i % 3 == 1) {
+              } else if (i % 3 === 1) {
                   frames = [496, 498, 496];
               } else {
                   frames = [498, 496, 496];
@@ -99,32 +96,15 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
 
     function update () {
-
-    	if (cursors.up.isDown)
-        {
+    	if (cursors.up.isDown) {
 			socket.emit("move",Orientation.U);
-			//ship.move_towards(Orientation.U)
-            //ship.setOrientation(Orientation.U);
-        }
-        else if (cursors.right.isDown)
-        {
+        } else if (cursors.right.isDown) {
 			socket.emit("move",Orientation.UR);
-            //ship.move_towards(Orientation.UR)
-            //ship.setOrientation(Orientation.UR)
-        }
-        else if (cursors.left.isDown)
-        {
+        } else if (cursors.left.isDown) {
 			socket.emit("move",Orientation.DL);
-            //ship.move_towards(Orientation.DL)
-            //ship.setOrientation(Orientation.DL);
-        }
-		else if (cursors.down.isDown)
-		{
+        } else if (cursors.down.isDown) {
 			socket.emit("move",Orientation.D);
-            //ship.move_towards(Orientation.D)
-            //ship.setOrientation(Orientation.D);
 		}
-
     }
 
     function setAnchorMid(sprite) {
@@ -132,12 +112,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     	sprite.anchor.y = 0.5;
     }
 
-    function hex2pixCoords(hex_x,hex_y) {
-    	let pix_coords = {};
-    	pix_coords.x = SCALE * Cell.WIDTH*0.75 * (hex_y + hex_x) + OFFSET_X;
-    	pix_coords.y = SCALE * Cell.HEIGHT*0.5 * (-hex_x + hex_y) + OFFSET_Y;
-    	return pix_coords;
-    }
     function position2dToPixels2(hex_x,hex_y){
 		let pix_coords = {},
             offset = 50;
@@ -148,11 +122,11 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
     function renderShips() {
         for (let p in players) {
-            if (typeof players[p].sprite == "undefined"){
-                if (players[p].team == "you"){
+            if (typeof players[p].sprite === "undefined"){
+                if (players[p].team === "you"){
                     players[p].sprite = game.add.sprite(0, 0, 'playership');
                 }
-                else if (players[p].team == "enemy") {
+                else if (players[p].team === "enemy") {
                     players[p].sprite = game.add.sprite(0, 0, 'enemyship');
                 }
                 else {
@@ -188,7 +162,7 @@ socket.on('gamestate', function( data ) {
     //console.log('Received game state', data);
     data.players.forEach( function (player) {
         let socketId = player.id;
-        if (typeof players[socketId] == "undefined") {
+        if (typeof players[socketId] === "undefined") {
             players[socketId] = {};
         }
         players[socketId].team = player.team;
