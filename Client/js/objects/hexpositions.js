@@ -10,7 +10,7 @@ let Orientation = {
     None: 0
 };
 
-export class HexPosition {
+class HexPosition {
     constructor(x,y,z) {
         this.x = x;
         this.y = y;
@@ -127,16 +127,16 @@ export class HexPosition {
         return hexPosition.add(this)
 
     }
-    distance2d(){
+    position2d(){
         let downleftUprightDistance = this.x;
-        let downleftUprightVector = this.unitary_vector(Orientation.DL).product(downleftUprightDistance);
+        let downleftUprightVector = HexPosition.unitary_vector(Orientation.DL).product(downleftUprightDistance);
         let centeredVector = this.add(downleftUprightVector);
         let upDownDistance = centeredVector.cardinality();
 
         if(centeredVector.orientationFromCentre() == Orientation.D){
             upDownDistance *= -1;
         }
-        return [downleftUprightDistance*0.5,-downleftUprightDistance*0.5+upDownDistance]
+        return {x: downleftUprightDistance*0.866,y: -downleftUprightDistance*0.5+upDownDistance}
     }
     stringify(){
         return "x: "+this.x+", y: "+this.y+", z: "+this.z
@@ -208,4 +208,4 @@ function test_hexposition(){
 
 }
 
-test_hexposition();
+//test_hexposition();

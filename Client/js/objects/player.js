@@ -1,42 +1,31 @@
+
+
 class Player {
 	constructor(x,y) {
 		this.x = x;
 		this.y = y;
-		this.rotation = 0;
+		this.position = new HexPosition(0,0,0)
+		this.orientation = Orientation.U;
 	}
 
-	turnLeft() {
-		this.rotation = (this.rotation + 5) % 6;
+	setOrientation(orientation) {
+		this.orientation = orientation;
 	}
 
 	turnRight() {
 		this.rotation = (this.rotation + 1) % 6;
 	}
 
-	move() {
-		if (this.rotation == 0) {
-			this.x += 1;
-			this.y -= 1;
-		}
-		else if (this.rotation == 1) {
-			this.x += 1;
-		}
-		else if (this.rotation == 2) {
-			this.y += 1;
-		}
-		else if (this.rotation == 3) {
-			this.x -= 1;
-			this.y += 1;
-		}
-		else if (this.rotation == 4) {
-			this.x -= 1;
-		}
-		else if (this.rotation == 5) {
-			this.y -= 1;
-		}
+
+
+	move_towards(orientation) {
+		this.position = this.position.move_towards(orientation,1)
 	}
 
 	getPosition(){
-		return {x: this.x, y: this.y, rotation: this.rotation};
+		return this.position;
+	}
+	getOrientation(){
+		return this.orientation;
 	}
 }

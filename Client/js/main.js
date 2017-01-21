@@ -19,7 +19,7 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
     var ship;
 
     function create () {
-        createBackground();
+        //createBackground();
         //get size from server
         let size_x = 7;
         let size_y = 7;
@@ -30,7 +30,7 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
         	for (let j = 0; j < size_y; j++){
                 let type = grid.getCell(i,j);
                 if (type != -1) {
-                    let coords = hex2pixCoords(i,j);
+                    let coords = position2dToPixels(i,j);
                     let cell = game.add.sprite(coords.x, coords.y, 'cell');
                     setAnchorMid(cell);
                 }
@@ -70,24 +70,33 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
 
     	if (cursors.up.isDown)
         {
-            player.move()
+            player.move_towards(Orientation.U);
+			player.setOrientation(Orientation.U);
         }
         else if (cursors.right.isDown)
         {
-            player.turnRight()
+			player.move_towards(Orientation.UR);
+			player.setOrientation(Orientation.UR)
         }
         else if (cursors.left.isDown)
         {
-            player.turnLeft()
+			player.move_towards(Orientation.DL);
+			player.setOrientation(Orientation.DL);
         }
+		else if (cursors.down.isDown)
+		{
+			player.move_towards(Orientation.D);
+			player.setOrientation(Orientation.D);
+		}
 
 
         //render players
-        let player_position = player.getPosition();
-        let player_hex_position = hex2pixCoords(player_position.x, player_position.y);
-        ship.x = player_hex_position.x;
-        ship.y = player_hex_position.y;
-        ship.angle = player_position.rotation * 60;
+        let player2dposition = player.getPosition().position2d();
+        console.log(player2dposition);
+        let player_pixel_positions = position2dToPixels2(player2dposition.x, player2dposition.y);
+        ship.x = player_pixel_positions.x;
+        ship.y = player_pixel_positions.y;
+        ship.angle = (player.getOrientation()-1)* 60;
 
     }
 
@@ -96,9 +105,15 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
     	sprite.anchor.y = 0.5;
     }
 
-    function hex2pixCoords(hex_x,hex_y) {
+    function position2dToPixels(hex_x,hex_y) {
     	let pix_coords = {};
     	pix_coords.x = Cell.WIDTH*0.75 * (hex_y + hex_x) + OFFSET_X;
     	pix_coords.y = Cell.HEIGHT*0.5 * (-hex_x + hex_y) + OFFSET_Y;
     	return pix_coords;
+    }
+    function position2dToPixels2(hex_x,hex_y){
+		let pix_coords = {};
+		pix_coords.x = Cell.HEIGHT * hex_x +CANVAS_WIDTH/2-20;
+		pix_coords.y = Cell.HEIGHT * hex_y + CANVAS_HEIGHT/2;
+		return pix_coords;
     }
