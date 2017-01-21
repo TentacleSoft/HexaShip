@@ -43,25 +43,29 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         createBackground();
         createUI();
 
-		var max_dist = 4;
-		var topCell = new HexPosition(-max_dist,max_dist,0);
-		while(topCell.x < 0){
-			let newCell = topCell.copy();
-			while(newCell.z < max_dist){
+        let gridWidth = 10,
+            gridHeight = 5,
+            movingDown = true,
+            topCell = new HexPosition(0, 0, 0);
 
+		for (let column = 0; column < gridWidth; column++) {
+			let newCell = topCell.copy();
+			for (let row = 0; row < gridHeight; row++) {
 				let position2d = newCell.position2d();
 				let pixels2d = position2dToPixels2(position2d.x, position2d.y);
 
 				let cell = game.add.sprite(pixels2d.x, pixels2d.y, 'cell');
 				cell.scale.setTo(SCALE);
 				setAnchorMid(cell);
-				newCell = newCell.move_towards(Orientation.D,1);
+				newCell = newCell.move_towards(Orientation.D, 1);
 			}
-			topCell = topCell.move_towards(Orientation.UR,1);
-		}
+
+			topCell = movingDown ? topCell.move_towards(Orientation.DR, 1) : topCell.move_towards(Orientation.UR, 1);
+			movingDown = !movingDown;
+        }
 		topCell.move_towards(Orientation.D);
 
-		while(topCell.x <= max_dist){
+		/*while(topCell.x <= max_dist){
 			let newCell = topCell.copy();
 			while(newCell.y > -max_dist){
 
@@ -74,7 +78,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 				newCell = newCell.move_towards(Orientation.D,1);
 			}
 			topCell = topCell.move_towards(Orientation.DR,1);
-		}
+		}*/
 
         //get position from server
         ship = new Ship(0, 0, 0);
@@ -164,9 +168,10 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     	return pix_coords;
     }
     function position2dToPixels2(hex_x,hex_y){
-		let pix_coords = {};
-		pix_coords.x = SCALE *(Cell.HEIGHT * hex_x) + canvasWidth/2;
-		pix_coords.y = SCALE *(Cell.HEIGHT * hex_y) + canvasHeight/2 + 50 * SCALE;
+		let pix_coords = {},
+            offset = 50;
+		pix_coords.x = SCALE * (Cell.HEIGHT * hex_x) + 50 * SCALE + offset;
+		pix_coords.y = SCALE * (Cell.HEIGHT * hex_y) + 50 * SCALE + offset;
 		return pix_coords;
     }
 
