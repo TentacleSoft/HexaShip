@@ -41,7 +41,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
     function create () {
         createBackground();
-        createUI();
 
         let gridWidth = 10,
             gridHeight = 5,
@@ -87,6 +86,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         shipSprite.scale.setTo(SCALE);
     		setAnchorMid(shipSprite);
 		cursors = game.input.keyboard.createCursorKeys();
+        createUI();
     }
 
     function createBackground() {
