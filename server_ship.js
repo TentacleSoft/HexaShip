@@ -1,3 +1,7 @@
+var HexPositions = require('./client/js/objects/hexpositions'),
+    HexPosition = HexPositions.position,
+    Orientation = HexPositions.orientation;
+
 class Ship {
     constructor(x, y, z) {
         this.position = new HexPosition(x, y, z);
@@ -20,3 +24,5 @@ class Ship {
         return this.orientation;
     }
 }
+
+module.exports = Ship;

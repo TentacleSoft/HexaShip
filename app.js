@@ -1,7 +1,9 @@
 "use strict";
 
 var Player = require("./client/js/objects/player"),
-    HexPosition = require("./client/js/objects/hexpositions");
+    HexPositions = require("./client/js/objects/hexpositions"),
+    HexPosition = HexPositions.position,
+    Ship = require("./server_ship");
 
 var port = process.env.PORT || 3000,
     express = require('express'),
@@ -23,19 +25,18 @@ app.get('/*', function (req, res, next) {
     res.sendFile(__dirname + '/client/' + file);
 });
 
-var players = [];
+var players = {};
 
 io.on('connection',function (socket) {
     console.log('Connected: ' + socket.id);
     // players[socket.id] = new Player (socket);
 
-    players.push(new Player(new HexPosition(0, 0, 0), socket));
+    players[socket.id] = new Player(new Ship(0, 0, 0), socket);
 
     socket.emit('onconnected', {id: socket.id});
 
-    socket.on('move', function (data) {
-        // TODO
-        // console.log('Player ' + socket.id + ' wants to move to ' + data.direction);
+    socket.on('move', function (orientation) {
+        players[socket.id].ship.move_towards(orientation);
     });
 
     /*updatePlayers();
@@ -54,17 +55,17 @@ io.on('connection',function (socket) {
 
 var sendTurn = function () {
     var gamestate = {players: []};
-    for (var i = 0; i < players.length; i++) {
+    for (var i in players) {
         var player = players[i];
         gamestate.players.push({
             nick: 'Cacatua ' + player.socket.id,
             orientation: player.orientation,
-            position: player.pos,
+            position: player.ship.position,
             team: 'you'
         });
     }
 
-    for (var i = 0; i < players.length; i++) {
+    for (var i in players) {
         players[i].socket.emit("gamestate", gamestate);
     }
 };

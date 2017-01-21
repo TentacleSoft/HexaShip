@@ -1,6 +1,6 @@
 class Player {
-    constructor(pos, socket) {
-        this.pos = pos;
+    constructor(ship, socket) {
+        this.ship = ship;
         this.socket = socket;
     }
 }

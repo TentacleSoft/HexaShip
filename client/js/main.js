@@ -127,26 +127,26 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
     	if (cursors.up.isDown)
         {
 			socket.emit("move",Orientation.U);
-			ship.move_towards(Orientation.U)
-			ship.setOrientation(Orientation.U);
+			//ship.move_towards(Orientation.U)
+            //ship.setOrientation(Orientation.U);
         }
         else if (cursors.right.isDown)
         {
 			socket.emit("move",Orientation.UR);
-			ship.move_towards(Orientation.UR)
-			ship.setOrientation(Orientation.UR)
+            //ship.move_towards(Orientation.UR)
+            //ship.setOrientation(Orientation.UR)
         }
         else if (cursors.left.isDown)
         {
 			socket.emit("move",Orientation.DL);
-			ship.move_towards(Orientation.DL)
-			ship.setOrientation(Orientation.DL);
+            //ship.move_towards(Orientation.DL)
+            //ship.setOrientation(Orientation.DL);
         }
 		else if (cursors.down.isDown)
 		{
 			socket.emit("move",Orientation.D);
-			ship.move_towards(Orientation.D)
-			ship.setOrientation(Orientation.D);
+            //ship.move_towards(Orientation.D)
+            //ship.setOrientation(Orientation.D);
 		}
 
 
