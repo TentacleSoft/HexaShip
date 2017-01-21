@@ -64,21 +64,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         }
 		topCell.move_towards(Orientation.D);
 
-		/*while(topCell.x <= max_dist){
-			let newCell = topCell.copy();
-			while(newCell.y > -max_dist){
-
-				let position2d = newCell.position2d();
-				let pixels2d = position2dToPixels2(position2d.x, position2d.y);
-
-				let cell = game.add.sprite(pixels2d.x, pixels2d.y, 'cell');
-				cell.scale.setTo(SCALE);
-				setAnchorMid(cell);
-				newCell = newCell.move_towards(Orientation.D,1);
-			}
-			topCell = topCell.move_towards(Orientation.DR,1);
-		}*/
-
         //get position from server
         ship = new Ship(0, 0, 0);
 
