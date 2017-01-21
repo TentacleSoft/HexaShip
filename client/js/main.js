@@ -14,6 +14,7 @@ const SCALE = canvasWidth / 900;
 const OFFSET_X = 100 * SCALE;
 
 //Game stuff
+var socket;
 var players = {};
 var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
@@ -49,6 +50,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         createFuckingGrid();
 		cursors = game.input.keyboard.createCursorKeys();
         createUI();
+        createConnection();
     }
 
     function createSpriteGroups() {
@@ -182,33 +184,32 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     }
 
 
-
-// SOCKET CONNECTION STUFF
-
-var socket = io.connect('/');
-//Now we can listen for that event
-socket.on('onconnected', function( data ) {
-    //Note that the data is the object we sent from the server, as is. So we can assume its id exists.
-    console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
-});
-
-socket.on('gamestate', function( data ) {
-
-    //console.log('Received game state', data);
-    data.players.forEach( function (player) {
-        let socketId = player.id;
-        if (typeof players[socketId] === "undefined") {
-            players[socketId] = {};
-        }
-        players[socketId].team = player.team;
-        players[socketId].position = player.position;
-        players[socketId].orientation = player.orientation;
+function createConnection() {
+    socket = io.connect('/');
+    //Now we can listen for that event
+    socket.on('onconnected', function (data) {
+        //Note that the data is the object we sent from the server, as is. So we can assume its id exists.
+        console.log('Connected successfully to the socket.io server. My server side ID is ' + data.id);
     });
-    renderShips();
-});
 
-socket.on('disconnected', function (id) {
-    console.log('Que covard! el ' + id + ' s\'ha desconnectat!');
-    players[id].sprite.destroy();
-    delete players[id];
-});
+    socket.on('gamestate', function (data) {
+
+        //console.log('Received game state', data);
+        data.players.forEach(function (player) {
+            let socketId = player.id;
+            if (typeof players[socketId] === "undefined") {
+                players[socketId] = {};
+            }
+            players[socketId].team = player.team;
+            players[socketId].position = player.position;
+            players[socketId].orientation = player.orientation;
+        });
+        renderShips();
+    });
+
+    socket.on('disconnected', function (id) {
+        console.log('Que covard! el ' + id + ' s\'ha desconnectat!');
+        players[id].sprite.destroy();
+        delete players[id];
+    });
+}
