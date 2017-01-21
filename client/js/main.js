@@ -1,12 +1,20 @@
-const CANVAS_HEIGHT = 800;
-const CANVAS_WIDTH = 1400;
-const OFFSET_X = 100;
+availableWidth = window.innerWidth;
+availableHeight = window.innerHeight;
+if (availableWidth / availableHeight > 700/400) {
+  var CANVAS_HEIGHT = availableHeight;
+  var CANVAS_WIDTH = availableHeight * 700/400;
+} else {
+  var CANVAS_WIDTH = availableWidth;
+  var CANVAS_HEIGHT = availableWidth*400/700;
+}
+
+const SCALE = CANVAS_WIDTH/1400;
+const OFFSET_X = 100 * SCALE;
 const OFFSET_Y = CANVAS_HEIGHT/2;
 
 var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
     function preload () {
-
         game.load.image('cell', '../assets/hexagon_border.png');
         game.load.image('redship', '../assets/ship1.png');
 
@@ -32,6 +40,7 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
                 if (type != -1) {
                     let coords = hex2pixCoords(i,j);
                     let cell = game.add.sprite(coords.x, coords.y, 'cell');
+                    cell.scale.setTo(SCALE);
                     setAnchorMid(cell);
                 }
         	}
@@ -41,29 +50,30 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
         player = new Player(0,0);
 
         ship = game.add.sprite(0, 0, 'redship');
-		setAnchorMid(ship);
+        ship.scale.setTo(SCALE);
+    		setAnchorMid(ship);
 
 		cursors = game.input.keyboard.createCursorKeys();
     }
 
     function createBackground() {
       let background = [];
-      for (i = 0; i < CANVAS_WIDTH/32; ++i) {
-                background[i] = [];
-                for (j = 0; j < CANVAS_HEIGHT/32; ++j) {
-                    background[i][j] = game.add.sprite(32 * i, j * 32, 'beach')
-                    var frames = [];
-                    if (i % 3 == 0) {
-                        frames = [496, 496, 498];
-                    } else if (i % 3 == 1) {
-                        frames = [496, 498, 496];
-                    } else {
-                        frames = [498, 496, 496];
-                    }
-                    background[i][j].animations.add('water', frames, 0.5, true);
-                    background[i][j].animations.play('water');
-                }
-            }
+      for (i = 0; i <= window.innerWidth/32; ++i) {
+          background[i] = [];
+          for (j = 0; j <= window.innerHeight/32; ++j) {
+              background[i][j] = game.add.sprite(32 * i, j * 32, 'beach')
+              var frames = [];
+              if (i % 3 == 0) {
+                  frames = [496, 496, 498];
+              } else if (i % 3 == 1) {
+                  frames = [496, 498, 496];
+              } else {
+                  frames = [498, 496, 496];
+              }
+              background[i][j].animations.add('water', frames, 0.5, true);
+              background[i][j].animations.play('water');
+          }
+      }
     }
 
     function update () {
@@ -98,7 +108,7 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
 
     function hex2pixCoords(hex_x,hex_y) {
     	let pix_coords = {};
-    	pix_coords.x = Cell.WIDTH*0.75 * (hex_y + hex_x) + OFFSET_X;
-    	pix_coords.y = Cell.HEIGHT*0.5 * (-hex_x + hex_y) + OFFSET_Y;
+    	pix_coords.x = SCALE * Cell.WIDTH*0.75 * (hex_y + hex_x) + OFFSET_X;
+    	pix_coords.y = SCALE * Cell.HEIGHT*0.5 * (-hex_x + hex_y) + OFFSET_Y;
     	return pix_coords;
     }
