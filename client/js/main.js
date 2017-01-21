@@ -5,6 +5,10 @@ socket.on('onconnected', function( data ) {
     console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
 });
 
+socket.on('gamestate', function( data ) {
+	data.players.forEach()
+});
+
 availableWidth = window.innerWidth;
 availableHeight = window.innerHeight;
 
@@ -43,7 +47,7 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
 
     function create () {
         //createBackground();
-        //get size from server
+        //get size from serverg
         let size_x = 7;
         let size_y = 7;
         var grid = new Grid(size_x,size_y);
@@ -67,7 +71,6 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
         ship = game.add.sprite(0, 0, 'redship');
         ship.scale.setTo(SCALE);
     		setAnchorMid(ship);
-
 		cursors = game.input.keyboard.createCursorKeys();
     }
 
@@ -94,26 +97,31 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
     function createUI() {
     }
 
+
     function update () {
 
     	if (cursors.up.isDown)
         {
-            player.move_towards(Orientation.U);
+			socket.emit("move",Orientation.U);
+			player.move_towards(Orientation.U)
 			player.setOrientation(Orientation.U);
         }
         else if (cursors.right.isDown)
         {
-			player.move_towards(Orientation.UR);
+			socket.emit("move",Orientation.UR);
+			player.move_towards(Orientation.UR)
 			player.setOrientation(Orientation.UR)
         }
         else if (cursors.left.isDown)
         {
-			player.move_towards(Orientation.DL);
+			socket.emit("move",Orientation.DL);
+			player.move_towards(Orientation.DL)
 			player.setOrientation(Orientation.DL);
         }
 		else if (cursors.down.isDown)
 		{
-			player.move_towards(Orientation.D);
+			socket.emit("move",Orientation.D);
+			player.move_towards(Orientation.D)
 			player.setOrientation(Orientation.D);
 		}
 
@@ -142,6 +150,6 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
     function position2dToPixels2(hex_x,hex_y){
 		let pix_coords = {};
 		pix_coords.x = SCALE *(Cell.HEIGHT * hex_x-20) +canvasWidth/2;
-		pix_coords.y = SCALE * (Cell.HEIGHT * hex_y) + availableHeight/2;
+		pix_coords.y = SCALE *(Cell.HEIGHT * hex_y) + canvasHeight/2;
 		return pix_coords;
     }
