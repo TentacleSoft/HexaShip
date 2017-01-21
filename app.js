@@ -55,6 +55,10 @@ io.on('connection',function (socket) {
     socket.on('disconnect', function () {
         console.log('Disconnected: ' + socket.id);
         delete players[socket.id];
+
+        for (var id in players) {
+            players[id].socket.emit('disconnected', socket.id);
+        }
     });
 });
 
@@ -64,6 +68,7 @@ var sendTurn = function () {
         for (var j in players) {
             var player = players[j];
             gamestate.players.push({
+                id: player.socket.id,
                 nick: 'Cacatua ' + player.socket.id,
                 orientation: player.ship.orientation,
                 position: player.ship.position,

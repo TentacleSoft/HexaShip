@@ -223,3 +223,7 @@ socket.on('gamestate', function( data ) {
     });
     renderShips();
 });
+
+socket.on('disconnected', function (id) {
+    console.log('Que covard! el ' + id + ' s\'ha desconnectat!');
+});
