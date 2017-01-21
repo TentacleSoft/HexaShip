@@ -10,6 +10,8 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
         game.load.image('cell', '../assets/hexagon_border.png');
         game.load.image('redship', '../assets/ship1.png');
 
+        // TODO give attribution notice for Ivan Voirol : http://opengameart.org/content/basic-map-32x32-by-silver-iv
+        game.load.spritesheet('beach', 'assets/beachmap.png', 32, 32);
     }
 
     var cursors;
@@ -17,7 +19,7 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
     var ship;
 
     function create () {
-    	game.stage.backgroundColor = 0x00ffff;
+        createBackground();
         //get size from server
         let size_x = 7;
         let size_y = 7;
@@ -39,6 +41,26 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
 		setAnchorMid(ship);
 
 		cursors = game.input.keyboard.createCursorKeys();
+    }
+
+    function createBackground() {
+      let background = [];
+      for (i = 0; i < CANVAS_WIDTH/32; ++i) {
+                background[i] = [];
+                for (j = 0; j < CANVAS_HEIGHT/32; ++j) {
+                    background[i][j] = game.add.sprite(32 * i, j * 32, 'beach')
+                    var frames = [];
+                    if (i % 3 == 0) {
+                        frames = [496, 496, 498];
+                    } else if (i % 3 == 1) {
+                        frames = [496, 498, 496];
+                    } else {
+                        frames = [498, 496, 496];
+                    }
+                    background[i][j].animations.add('water', frames, 0.5, true);
+                    background[i][j].animations.play('water');
+                }
+            }
     }
 
     function update () {
@@ -63,7 +85,7 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
         ship.x = player_hex_position.x;
         ship.y = player_hex_position.y;
         ship.angle = player_position.rotation * 60;
-        
+
     }
 
     function setAnchorMid(sprite) {
@@ -77,4 +99,3 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
     	pix_coords.y = Cell.HEIGHT*0.5 * (-hex_x + hex_y) + OFFSET_Y;
     	return pix_coords;
     }
-
