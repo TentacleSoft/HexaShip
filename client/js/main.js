@@ -35,34 +35,52 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     }
 
     var cursors;
+    var ship;
+    var shipSprite;
+    var grid;
 
     function create () {
-        createBackground();
+        //createBackground();
+        createFuckingGrid();
+		cursors = game.input.keyboard.createCursorKeys();
+        createUI();
+    }
 
+    function createFuckingGrid() {
+        grid = {} ;
         let gridWidth = 10,
             gridHeight = 5,
             movingDown = true,
             topCell = new HexPosition(0, 0, 0);
 
-		for (let column = 0; column < gridWidth; column++) {
-			let newCell = topCell.copy();
-			for (let row = 0; row < gridHeight; row++) {
-				let position2d = newCell.position2d();
-				let pixels2d = position2dToPixels2(position2d.x, position2d.y);
+        for (let column = 0; column < gridWidth; column++) {
+            let newCell = topCell.copy();
+            for (let row = 0; row < gridHeight; row++) {
+                let position2d = newCell.position2d();
+                let pixels2d = position2dToPixels2(position2d.x, position2d.y);
 
-				let cell = game.add.sprite(pixels2d.x, pixels2d.y, 'cell');
-				cell.scale.setTo(SCALE);
-				setAnchorMid(cell);
-				newCell = newCell.move_towards(Orientation.D, 1);
-			}
+                let cell = game.add.sprite(pixels2d.x, pixels2d.y, 'cell');
+                cell.scale.setTo(SCALE);
+                setAnchorMid(cell);
+                addSpriteToGrid(grid, newCell.x, newCell.y, newCell.z, cell);
+                newCell = newCell.move_towards(Orientation.D, 1);
+            }
 
-			topCell = movingDown ? topCell.move_towards(Orientation.DR, 1) : topCell.move_towards(Orientation.UR, 1);
-			movingDown = !movingDown;
+            topCell = movingDown ? topCell.move_towards(Orientation.DR, 1) : topCell.move_towards(Orientation.UR, 1);
+            movingDown = !movingDown;
         }
-		topCell.move_towards(Orientation.D);
+        topCell.move_towards(Orientation.D);
+    }
+
+    function addSpriteToGrid(grid,x,y,z,sprite){
+        if (typeof grid[x] == "undefined") {
+            grid[x] = {};
+        }
+        if (typeof grid[x][y] == "undefined") {
+            grid[x][y] = {};
+        }
+        grid[x][y][z] = sprite;
         
-		cursors = game.input.keyboard.createCursorKeys();
-        createUI();
     }
 
     function createBackground() {
@@ -93,7 +111,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         setAnchorMid(missile);
         missile.scale.setTo(SCALE);
     }
-
 
     function update () {
     	if (cursors.up.isDown) {
