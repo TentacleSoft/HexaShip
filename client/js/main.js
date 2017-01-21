@@ -87,7 +87,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             topCell = movingDown ? topCell.move_towards(Orientation.DR, 1) : topCell.move_towards(Orientation.UR, 1);
             movingDown = !movingDown;
         }
-        topCell.move_towards(Orientation.D);
     }
 
     function addSpriteToGrid(grid,x,y,z,sprite){
@@ -98,7 +97,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             grid[x][y] = {};
         }
         grid[x][y][z] = sprite;
-        
+
     }
 
     function createBackground() {
@@ -130,7 +129,14 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         missile.scale.setTo(SCALE);
     }
 
-    function update () {
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+
+        function update () {
+        let timeToSleep = 500;
     	if (cursors.up.isDown) {
 			socket.emit("move",Orientation.U);
         } else if (cursors.right.isDown) {
@@ -139,7 +145,11 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 			socket.emit("move",Orientation.DL);
         } else if (cursors.down.isDown) {
 			socket.emit("move",Orientation.D);
-		}
+		}else{
+    	    time_to_sleep = 0
+        }
+        sleep(500);
+
     }
 
     function setAnchorMid(sprite) {

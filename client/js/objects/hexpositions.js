@@ -207,10 +207,8 @@ class HexPosition {
 			topCell = new HexPosition(this.x,-(this.x)/2,-(this.x)/2);
         }
         if(this.x > MAX_WIDTH || this.x < 0){
-            console.log("Too far right or left");
 			return false;
         }else if(this.straight_orientation_to(topCell)==Orientation.D || this.distance_to(topCell) > MAX_HEIGHT){
-			console.log("Too far down or up");
 			return false;
         }
 		return true;
