@@ -48,6 +48,9 @@ class HexPosition {
                 y = 1;
                 z = 0;
                 break;
+            default:
+                console.log("DEFAULTED");
+                break;
         }
         return new HexPosition(x,y,z);
     }
@@ -119,6 +122,7 @@ class HexPosition {
     move_towards(orientation,distance){
         let hexPosition = this.unitary_vector(orientation);
         hexPosition = hexPosition.product(distance);
+
         return hexPosition.add(this)
 
     }
@@ -135,6 +139,28 @@ class HexPosition {
     }
     stringify(){
         return "x: "+this.x+", y: "+this.y+", z: "+this.z
+    }
+    get_neighbours(){
+        let neighbours = [];
+        for(var orientation in Orientation){
+            if(Orientation[orientation] != Orientation.None){
+                let new_position = this.move_towards(Orientation[orientation],1);
+                neighbours.push(new_position)
+            }
+
+        };
+        return neighbours;
+    }
+    get_line_towards(orientation,max_dist){
+        let linePositions = [];
+        for (var i = 1; i < max_dist; i++) {
+            let new_position = this.move_towards(orientation,i);
+            linePositions.push(new_position)
+        }
+        return linePositions;
+    }
+    within_center(boardLength){
+        return this.cardinality() <= boardLength;
     }
 }
 
@@ -170,9 +196,15 @@ function test_hexposition(){
                 console.log("Wrong movement!: "+movedHexcosa.x+","+movedHexcosa.y+","+movedHexcosa.z)
             }
         }
-        console.log(hexcosa.stringify()+"; position 2D: "+hexcosa.distance2d())
+        console.log("line towards UR of "+hexcosa.stringify()+":")
+        hexcosa.get_line_towards(Orientation.UR,4).forEach(function(neighbour) {
+            if(neighbour.within_center(3)){
+                console.log(neighbour.stringify())
+            }
+
+        })
     });
 
 }
 
-//test_hexposition()
+test_hexposition()
