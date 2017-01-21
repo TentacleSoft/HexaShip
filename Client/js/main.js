@@ -28,9 +28,12 @@ var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { prelo
 
         for (let i = 0; i < size_y; i++){
         	for (let j = 0; j < size_y; j++){
-        		let coords = hex2pixCoords(i,j);
-		        let cell = game.add.sprite(coords.x, coords.y, 'cell');
-		        setAnchorMid(cell);
+                let type = grid.getCell(i,j);
+                if (type != -1) {
+                    let coords = hex2pixCoords(i,j);
+                    let cell = game.add.sprite(coords.x, coords.y, 'cell');
+                    setAnchorMid(cell);
+                }
         	}
         }
 
