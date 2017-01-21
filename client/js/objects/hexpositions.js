@@ -13,10 +13,10 @@ let Orientation = {
 function turn_right(orientation,factor){
     let new_orientation = orientation + factor;
     while(new_orientation > 6){
-		new_orientation-6;
+		new_orientation -= 6;
 	}
 	while(new_orientation < 1){
-		new_orientation+6;
+		new_orientation += 6;
 	}
 	return new_orientation;
 }
@@ -26,7 +26,7 @@ function turn_left(orientation,factor){
 }
 
 class HexPosition {
-    constructor(x,y,z) {
+    constructor(x, y, z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -130,7 +130,7 @@ class HexPosition {
     }
     //es una posicio, però generalment només hauries de sumar vectors
     add(pos){
-        return new HexPosition(this.x+pos.x,this.y+pos.y,this.z+pos.z)
+        return new HexPosition(this.x+pos.x,this.y+pos.y,this.z+pos.z);
     }
     substract(pos){
         return this.add(pos.product(-1));
@@ -142,7 +142,7 @@ class HexPosition {
         let hexPosition = HexPosition.unitary_vector(orientation);
         hexPosition = hexPosition.product(distance);
 
-        return hexPosition.add(this)
+        return hexPosition.add(this);
 
     }
     position2d(){
@@ -157,14 +157,14 @@ class HexPosition {
         return {x: downleftUprightDistance*0.866,y: -downleftUprightDistance*0.5+upDownDistance}
     }
     stringify(){
-        return "x: "+this.x+", y: "+this.y+", z: "+this.z
+        return "x: "+this.x+", y: "+this.y+", z: "+this.z;
     }
     get_neighbours(){
         let neighbours = [];
         for(var orientation in Orientation){
             if(Orientation[orientation] != Orientation.None){
                 let new_position = this.move_towards(Orientation[orientation],1);
-                neighbours.push(new_position)
+                neighbours.push(new_position);
             }
 
         };
@@ -174,13 +174,19 @@ class HexPosition {
         let linePositions = [];
         for (var i = 1; i < max_dist; i++) {
             let new_position = this.move_towards(orientation,i);
-            linePositions.push(new_position)
+            linePositions.push(new_position);
         }
         return linePositions;
     }
     within_center(boardLength){
         return this.cardinality() <= boardLength;
     }
+    get_front_side_lines(orientation,length){
+        return [this.get_line_towards(turn_left(orientation,1),length),this.get_line_towards(turn_right(orientation,1),length)];
+    }
+	get_back_side_lines(orientation,length){
+		return [this.get_line_towards(turn_left(orientation,2),length),this.get_line_towards(turn_right(orientation,2),length)];
+	}
 }
 
 
@@ -203,24 +209,26 @@ function test_hexposition(){
         let orientation = hexcosa.straight_orientation_to(hexcusa);
 
         if(distance != expected_distance){
-            console.log("Wrong distance: "+distance)
+            console.log("Wrong distance: "+distance);
         }
 
         if(orientation != expected_orientation){
-            console.log("Wrong orientation: "+orientation)
+            console.log("Wrong orientation: "+orientation);
         }
         else if(orientation != Orientation.None){
             let movedHexcosa = hexcosa.move_towards(orientation,distance);
             if(!movedHexcosa.equals(hexcusa)){
-                console.log("Wrong movement!: "+movedHexcosa.x+","+movedHexcosa.y+","+movedHexcosa.z)
+                console.log("Wrong movement!: "+movedHexcosa.x+","+movedHexcosa.y+","+movedHexcosa.z);
             }
         }
-        console.log("line towards UR of "+hexcosa.stringify()+":");
-        hexcosa.get_line_towards(Orientation.UR,4).forEach(function(neighbour) {
-            if(neighbour.within_center(3)){
-                console.log(neighbour.stringify())
-            }
-
+        console.log("canons from  UR of "+hexcosa.stringify()+":");
+        hexcosa.get_front_side_lines(Orientation.UR,4).forEach(function(line) {
+            console.log("canons:");
+			line.forEach(function(neighbour) {
+				if (neighbour.within_center(3)) {
+					console.log(neighbour.stringify());
+				}
+			})
         })
     });
 
