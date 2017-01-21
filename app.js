@@ -37,6 +37,7 @@ io.on('connection',function (socket) {
 
     socket.on('move', function (orientation) {
         players[socket.id].ship.move_towards(orientation);
+        players[socket.id].ship.setOrientation(orientation);
     });
 
     /*updatePlayers();
