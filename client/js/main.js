@@ -1,15 +1,3 @@
-var socket = io.connect('/');
-//Now we can listen for that event
-socket.on('onconnected', function( data ) {
-    //Note that the data is the object we sent from the server, as is. So we can assume its id exists.
-    console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
-});
-
-socket.on('gamestate', function( data ) {
-    console.log('Received game state', data);
-	// data.players.forEach()
-});
-
 availableWidth = window.innerWidth;
 availableHeight = window.innerHeight;
 
@@ -26,13 +14,18 @@ const SCALE = canvasWidth / 900;
 const OFFSET_X = 100 * SCALE;
 const OFFSET_Y = canvasHeight / 2;
 
+//Game stuff
+var players = {};
 var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
 
     function preload () {
 
         //game assets
         game.load.image('cell', '../assets/hexagon_border.png');
-        game.load.image('redship', '../assets/ship1.png');
+        game.load.image('enemyship', '../assets/enemyship.png');
+        game.load.image('allyship', '../assets/allyship.png');
+        game.load.image('playership', '../assets/playership.png');
 
         //UI assets
         game.load.image('button', '../assets/button.png');
@@ -49,6 +42,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
     function create () {
         createBackground();
+        createUI();
 
 		var max_dist = 4;
 		var topCell = new HexPosition(-max_dist,max_dist,0);
@@ -86,7 +80,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         //get position from server
         ship = new Ship(0, 0, 0);
 
-        shipSprite = game.add.sprite(0, 0, 'redship');
+        shipSprite = game.add.sprite(0, 0, 'playership');
         shipSprite.scale.setTo(SCALE);
     		setAnchorMid(shipSprite);
 		cursors = game.input.keyboard.createCursorKeys();
@@ -172,7 +166,56 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     }
     function position2dToPixels2(hex_x,hex_y){
 		let pix_coords = {};
-		pix_coords.x = SCALE *(Cell.HEIGHT * hex_x) +canvasWidth/2;
+		pix_coords.x = SCALE *(Cell.HEIGHT * hex_x) + canvasWidth/2;
 		pix_coords.y = SCALE *(Cell.HEIGHT * hex_y) + canvasHeight/2 + 50 * SCALE;
 		return pix_coords;
     }
+
+    function renderShips() {
+        for (let p in players) {
+            if (typeof players[p].sprite == "undefined"){
+                if (players[p].team == "you"){
+                    players[p].sprite = game.add.sprite(0, 0, 'playership');
+                }
+                else if (players[p].team == "enemy") {
+                    players[p].sprite = game.add.sprite(0, 0, 'enemyship');
+                }
+                else {
+                    players[p].sprite = game.add.sprite(0, 0, 'allyship');
+                }
+                setAnchorMid(players[p].sprite);
+                players[p].sprite.scale.setTo(SCALE);
+            }
+
+            let player_hex_position = new HexPosition(players[p].position.x, players[p].position.y, players[p].position.z);
+            let player_2d_position = player_hex_position.position2d();
+            player_2d_position = position2dToPixels2(player_2d_position.x,player_2d_position.y);
+            players[p].sprite.x = player_2d_position.x;
+            players[p].sprite.y = player_2d_position.y;
+        };
+    }
+
+
+// SOCKET CONNECTION STUFF
+
+var socket = io.connect('/');
+//Now we can listen for that event
+socket.on('onconnected', function( data ) {
+    //Note that the data is the object we sent from the server, as is. So we can assume its id exists.
+    console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
+});
+
+socket.on('gamestate', function( data ) {
+
+    //console.log('Received game state', data);
+    data.players.forEach( function (player) {
+        let nick = player.nick;
+        if (typeof players[nick] == "undefined") {
+            players[nick] = {};
+        }
+        players[nick].team = player.team;
+        players[nick].position = player.position;
+        players[nick].orientation = player.orientation;
+    });
+    renderShips();
+});
