@@ -26,7 +26,7 @@ const SCALE = canvasWidth / 1400;
 const OFFSET_X = 100 * SCALE;
 const OFFSET_Y = canvasHeight / 2;
 
-var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
     function preload () {
 
