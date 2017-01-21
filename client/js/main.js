@@ -20,9 +20,8 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
 
     function preload () {
-
         //game assets
-        game.load.image('cell', '../assets/hexagon_border.png');
+        game.load.image('cell', '../assets/hexagon_border_blue.png');
         game.load.image('enemyship', '../assets/enemyship.png');
         game.load.image('allyship', '../assets/allyship.png');
         game.load.image('playership', '../assets/playership.png');
