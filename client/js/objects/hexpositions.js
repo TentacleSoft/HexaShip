@@ -155,6 +155,17 @@ class HexPosition {
 
 
 	}
+	move_towards_unrestricted(orientation,distance){
+		let hexPosition = HexPosition.unitary_vector(orientation);
+		hexPosition = hexPosition.product(distance);
+
+
+
+		let newPosition = hexPosition.add(this);
+
+		return newPosition;
+	}
+
     position2d(){
         let downleftUprightDistance = this.x;
         let downleftUprightVector = HexPosition.unitary_vector(Orientation.DL).product(downleftUprightDistance);
@@ -173,8 +184,10 @@ class HexPosition {
         let neighbours = [];
         for(var orientation in Orientation){
             if(Orientation[orientation] != Orientation.None){
-                let new_position = this.move_towards(Orientation[orientation],1);
-                neighbours.push(new_position);
+                let new_position = this.move_towards_unrestricted(Orientation[orientation],1);
+				if(new_position.within_box(MAX_WIDTH,MAX_HEIGHT)){
+					neighbours.push(new_position);
+				}
             }
 
         };
@@ -183,8 +196,11 @@ class HexPosition {
     get_line_towards(orientation,max_dist){
         let linePositions = [];
         for (var i = 1; i < max_dist; i++) {
-            let new_position = this.move_towards(orientation,i);
-            linePositions.push(new_position);
+            let new_position = this.move_towards_unrestricted(orientation,i);
+            if(new_position.within_box(MAX_WIDTH,MAX_HEIGHT)){
+				linePositions.push(new_position);
+            }
+
         }
         return linePositions;
     }
