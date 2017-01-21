@@ -59,7 +59,7 @@ var sendTurn = function () {
         var player = players[i];
         gamestate.players.push({
             nick: 'Cacatua ' + player.socket.id,
-            orientation: player.orientation,
+            orientation: player.ship.orientation,
             position: player.ship.position,
             team: 'you'
         });
