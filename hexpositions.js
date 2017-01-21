@@ -10,7 +10,7 @@ let Orientation = {
     None: 0
 };
 
-class HexPosition {
+export class HexPosition {
     constructor(x,y,z) {
         this.x = x;
         this.y = y;
