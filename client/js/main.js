@@ -39,11 +39,29 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     var shipSprite;
     var grid;
 
+    //groups
+    var sprites;
+
+
     function create () {
-        //createBackground();
+        createSpriteGroups();
+        createBackground();
         createFuckingGrid();
 		cursors = game.input.keyboard.createCursorKeys();
         createUI();
+    }
+
+    function createSpriteGroups() {
+        let background = game.add.group();
+        let grid = game.add.group();
+        let ships = game.add.group();
+        let ui = game.add.group();
+
+        sprites = {};
+        sprites.background = background;
+        sprites.grid = grid;
+        sprites.ships = ships;
+        sprites.ui = ui;
     }
 
     function createFuckingGrid() {
@@ -59,7 +77,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 let position2d = newCell.position2d();
                 let pixels2d = position2dToPixels2(position2d.x, position2d.y);
 
-                let cell = game.add.sprite(pixels2d.x, pixels2d.y, 'cell');
+                let cell = sprites.grid.create(pixels2d.x, pixels2d.y, 'cell');
                 cell.scale.setTo(SCALE);
                 setAnchorMid(cell);
                 addSpriteToGrid(grid, newCell.x, newCell.y, newCell.z, cell);
@@ -88,7 +106,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
       for (i = 0; i <= window.innerWidth/32; ++i) {
           background[i] = [];
           for (j = 0; j <= window.innerHeight/32; ++j) {
-              background[i][j] = game.add.sprite(32 * i, j * 32, 'beach')
+              background[i][j] = sprites.background.create(32 * i, j * 32, 'beach')
               let frames = [];
               if (i % 3 === 0) {
                   frames = [496, 496, 498];
@@ -104,10 +122,10 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     }
 
     function createUI() {
-        var missile_border = game.add.sprite(canvasWidth - OFFSET_X, OFFSET_X, 'button');
+        var missile_border = sprites.ui.create(canvasWidth - OFFSET_X, OFFSET_X, 'button');
         setAnchorMid(missile_border);
         missile_border.scale.setTo(SCALE);
-        var missile = game.add.sprite(canvasWidth - OFFSET_X, OFFSET_X, 'misile_button');
+        var missile = sprites.ui.create(canvasWidth - OFFSET_X, OFFSET_X, 'misile_button');
         setAnchorMid(missile);
         missile.scale.setTo(SCALE);
     }
@@ -141,13 +159,13 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         for (let p in players) {
             if (typeof players[p].sprite === "undefined"){
                 if (players[p].team === "you"){
-                    players[p].sprite = game.add.sprite(0, 0, 'playership');
+                    players[p].sprite = sprites.ships.create(0, 0, 'playership');
                 }
                 else if (players[p].team === "enemy") {
-                    players[p].sprite = game.add.sprite(0, 0, 'enemyship');
+                    players[p].sprite = sprites.ships.create(0, 0, 'enemyship');
                 }
                 else {
-                    players[p].sprite = game.add.sprite(0, 0, 'allyship');
+                    players[p].sprite = sprites.ships.create(0, 0, 'allyship');
                 }
                 setAnchorMid(players[p].sprite);
                 players[p].sprite.scale.setTo(SCALE);
