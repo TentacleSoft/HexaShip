@@ -6,6 +6,7 @@ socket.on('onconnected', function( data ) {
 });
 
 socket.on('gamestate', function( data ) {
+    console.log('Received game state', data);
 	// data.players.forEach()
 });
 

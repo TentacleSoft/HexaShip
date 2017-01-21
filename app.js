@@ -53,9 +53,20 @@ io.on('connection',function (socket) {
 });
 
 var sendTurn = function () {
-    /*for (var i = 0; i < players.length; i++) {
-        players[i].socket.emit('gamestate', {players: players});
-    }*/
+    var gamestate = {players: []};
+    for (var i = 0; i < players.length; i++) {
+        var player = players[i];
+        gamestate.players.push({
+            nick: 'Cacatua ' + player.socket.id,
+            orientation: player.orientation,
+            position: player.pos,
+            team: 'you'
+        });
+    }
+
+    for (var i = 0; i < players.length; i++) {
+        players[i].socket.emit("gamestate", gamestate);
+    }
 };
 
 setInterval(sendTurn, 1000);
