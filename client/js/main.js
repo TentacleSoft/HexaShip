@@ -46,8 +46,9 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
     var ship;
 
     function create () {
-        //createBackground();
-        //get size from serverg
+        createBackground();
+        createUI();
+        //get size from server
         let size_x = 7;
         let size_y = 7;
         var grid = new Grid(size_x,size_y);
@@ -95,6 +96,12 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
     }
 
     function createUI() {
+        var missile_border = game.add.sprite(canvasWidth - OFFSET_X, OFFSET_X, 'button');
+        setAnchorMid(missile_border);
+        missile_border.scale.setTo(SCALE);
+        var missile = game.add.sprite(canvasWidth - OFFSET_X, OFFSET_X, 'misile_button');
+        setAnchorMid(missile);
+        missile.scale.setTo(SCALE);
     }
 
 
