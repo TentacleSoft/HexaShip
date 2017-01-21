@@ -1,4 +1,4 @@
-var HexPositions = require('./client/js/objects/hexpositions'),
+var HexPositions = require('./../client/js/objects/hexpositions'),
     HexPosition = HexPositions.position,
     Orientation = HexPositions.orientation;
 

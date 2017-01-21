@@ -1,9 +1,10 @@
 "use strict";
 
-var Player = require("./client/js/objects/player"),
+var Player = require("./server/player"),
     HexPositions = require("./client/js/objects/hexpositions"),
     HexPosition = HexPositions.position,
-    Ship = require("./server_ship");
+    Ship = require("./server/server_ship"),
+    OrderQueue = require("./server/order_queue");
 
 var port = process.env.PORT || 3000,
     express = require('express'),
@@ -36,21 +37,17 @@ io.on('connection',function (socket) {
     socket.emit('onconnected', {id: socket.id});
 
     socket.on('move', function (orientation) {
-        players[socket.id].ship.move_towards(orientation);
-        players[socket.id].ship.setOrientation(orientation);
+        players[socket.id].orders.push({type: 'move', orientation: orientation});
     });
 
-    /*updatePlayers();
+    socket.on('shoot', function () {
+        var ships = [];
+        for (var id in players) {
+            ships.push(players[id].ship);
+        }
 
-    socket.on('keyChanged', function (key) {
-        players[socket.id].direction[key.key] = key.value;
-        movingPlayer(socket.id);
+        players[socket.id].ship.shoot(orientation, ships);
     });
-
-    socket.on('shoot', function (coord) {
-        shoots.push(new Shoot(players[socket.id].x,players[socket.id].y,coord.x,coord.y,socket.id));
-        sendingShoots();
-    });*/
 
     socket.on('disconnect', function () {
         console.log('Disconnected: ' + socket.id);
@@ -62,7 +59,38 @@ io.on('connection',function (socket) {
     });
 });
 
-var sendTurn = function () {
+var turn = function () {
+    console.log('Processing turn...');
+
+    for (var step = 0; step < 3; step++) { // TODO use OrderQueue.size
+        setTimeout(function () {
+            console.log('  > Processing order');
+            for (var i in players) {
+                var player = players[i];
+
+                var order = player.orders.pop();
+                if (typeof order !== "undefined") {
+                    processOrder(i, order);
+                }
+            }
+        }, step * 1000);
+    }
+};
+
+function processOrder(playerId, order) {
+    switch (order.type) {
+        case 'move':
+            // TODO validate orientation and movement
+            players[playerId].ship.move_towards(order.orientation);
+            players[playerId].ship.setOrientation(order.orientation);
+        case 'shoot':
+            console.log('TODO process shoot order');
+        default:
+            console.log('Undefined order type', order);
+    }
+}
+
+var sendGameState = function () {
     for (var i in players) {
         var gamestate = {players: []};
         for (var j in players) {
@@ -80,4 +108,5 @@ var sendTurn = function () {
     }
 };
 
-setInterval(sendTurn, 1000);
+setInterval(turn, 10000);
+setInterval(sendGameState, 1000);
