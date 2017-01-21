@@ -227,3 +227,5 @@ function test_hexposition(){
 }
 
 //test_hexposition();
+
+module.exports = HexPosition;

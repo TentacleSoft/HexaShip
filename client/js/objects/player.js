@@ -4,3 +4,5 @@ class Player {
         this.socket = socket;
     }
 }
+
+module.exports = Player;

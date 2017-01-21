@@ -6,7 +6,7 @@ socket.on('onconnected', function( data ) {
 });
 
 socket.on('gamestate', function( data ) {
-	data.players.forEach()
+	// data.players.forEach()
 });
 
 availableWidth = window.innerWidth;
