@@ -1,6 +1,6 @@
 class Ship {
-    constructor() {
-        this.position = new HexPosition(0,0,0);
+    constructor(x, y, z) {
+        this.position = new HexPosition(x, y, z);
         this.orientation = Orientation.U;
     }
 
@@ -9,13 +9,14 @@ class Ship {
     }
 
     move_towards(orientation) {
-        this.position = this.position.move_towards(orientation,1);
+        this.position = this.position.move_towards(orientation, 1)
     }
 
-    getPosition(){
+    getPosition() {
         return this.position;
     }
-    getOrientation(){
+
+    getOrientation() {
         return this.orientation;
     }
 }
