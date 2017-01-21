@@ -36,8 +36,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     }
 
     var cursors;
-    var ship;
-    var shipSprite;
     var grid;
 
     //groups
