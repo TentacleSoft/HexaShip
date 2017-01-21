@@ -1,3 +1,5 @@
+"use strict";
+
 var port = process.env.PORT || 3000,
     express = require('express'),
     app = express(),
@@ -20,11 +22,16 @@ app.get('/*', function (req, res, next) {
 
 io.on('connection',function (socket) {
     console.log('Connected: ' + socket.id);
-    players[socket.id] = new Player (socket);
+    // players[socket.id] = new Player (socket);
 
-    /*socket.emit('logged', socket.id);
+    socket.emit('onconnected', {id: socket.id});
 
-    updatePlayers();
+    socket.on('move', function (data) {
+        // TODO
+        console.log('Player ' + socket.id + ' wants to move to ' + data.direction);
+    });
+
+    /*updatePlayers();
 
     socket.on('keyChanged', function (key) {
         players[socket.id].direction[key.key] = key.value;

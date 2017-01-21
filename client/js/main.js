@@ -1,18 +1,26 @@
+var socket = io.connect('/');
+//Now we can listen for that event
+socket.on('onconnected', function( data ) {
+    //Note that the data is the object we sent from the server, as is. So we can assume its id exists.
+    console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
+});
+
 availableWidth = window.innerWidth;
 availableHeight = window.innerHeight;
-if (availableWidth / availableHeight > 700/400) {
-  var CANVAS_HEIGHT = availableHeight;
-  var CANVAS_WIDTH = availableHeight * 700/400;
+
+var canvasHeight = availableHeight;
+var canvasWidth = availableWidth;
+if (availableWidth / availableHeight > 700 / 400) {
+    canvasWidth = availableHeight * 700 / 400;
 } else {
-  var CANVAS_WIDTH = availableWidth;
-  var CANVAS_HEIGHT = availableWidth*400/700;
+    canvasHeight = availableWidth * 400 / 700;
 }
 
-const SCALE = CANVAS_WIDTH/1400;
+const SCALE = canvasWidth / 1400;
 const OFFSET_X = 100 * SCALE;
-const OFFSET_Y = CANVAS_HEIGHT/2;
+const OFFSET_Y = canvasHeight / 2;
 
-var game = new Phaser.Game(CANVAS_WIDTH, CANVAS_HEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
     function preload () {
 
