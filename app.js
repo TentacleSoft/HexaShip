@@ -59,18 +59,18 @@ io.on('connection',function (socket) {
 });
 
 var sendTurn = function () {
-    var gamestate = {players: []};
     for (var i in players) {
-        var player = players[i];
-        gamestate.players.push({
-            nick: 'Cacatua ' + player.socket.id,
-            orientation: player.ship.orientation,
-            position: player.ship.position,
-            team: 'you'
-        });
-    }
+        var gamestate = {players: []};
+        for (var j in players) {
+            var player = players[j];
+            gamestate.players.push({
+                nick: 'Cacatua ' + player.socket.id,
+                orientation: player.ship.orientation,
+                position: player.ship.position,
+                team: i === player.socket.id ? 'you' : 'enemy'
+            });
+        }
 
-    for (var i in players) {
         players[i].socket.emit("gamestate", gamestate);
     }
 };
