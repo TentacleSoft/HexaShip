@@ -1,7 +1,7 @@
 
 
 class Player {
-	constructor(x,y) {
+	constructor() {
 		this.position = new HexPosition(0,0,0)
 		this.orientation = Orientation.U;
 	}

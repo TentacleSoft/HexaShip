@@ -12,12 +12,13 @@ socket.on('gamestate', function( data ) {
 availableWidth = window.innerWidth;
 availableHeight = window.innerHeight;
 
+var canvasRatio = 700 / 400;
 var canvasHeight = availableHeight;
 var canvasWidth = availableWidth;
-if (availableWidth / availableHeight > 700 / 400) {
-    canvasWidth = availableHeight * 700 / 400;
+if (availableWidth / availableHeight > canvasRatio) {
+    canvasWidth = availableHeight * canvasRatio;
 } else {
-    canvasHeight = availableWidth * 400 / 700;
+    canvasHeight = availableWidth * (1/canvasRatio);
 }
 
 const SCALE = canvasWidth / 1400;
@@ -46,25 +47,42 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
     var ship;
 
     function create () {
-        createBackground();
-        createUI();
-        //get size from server
-        let size_x = 7;
-        let size_y = 7;
-        var grid = new Grid(size_x,size_y);
+        //createBackground();
 
+		var max_dist = 4;
+		var topCell = new HexPosition(-max_dist,max_dist,0);
+		while(topCell.x < 0){
+			let newCell = topCell.copy();
+			while(newCell.z < max_dist){
 
-        for (let i = 0; i < size_y; i++){
-        	for (let j = 0; j < size_y; j++){
-                let type = grid.getCell(i,j);
-                if (type != -1) {
-                    let coords = hex2pixCoords(i,j);
-                    let cell = game.add.sprite(coords.x, coords.y, 'cell');
-                    cell.scale.setTo(SCALE);
-                    setAnchorMid(cell);
-                }
-        	}
-        }
+				let position2d = newCell.position2d();
+				let pixels2d = position2dToPixels2(position2d.x, position2d.y);
+
+				let cell = game.add.sprite(pixels2d.x, pixels2d.y, 'cell');
+				cell.scale.setTo(SCALE);
+				setAnchorMid(cell);
+				newCell = newCell.move_towards(Orientation.D,1);
+				console.log(newCell.stringify());
+			}
+			topCell = topCell.move_towards(Orientation.UR,1);
+		}
+		topCell.move_towards(Orientation.D);
+
+		while(topCell.x <= max_dist){
+			let newCell = topCell.copy();
+			while(newCell.y > -max_dist){
+
+				let position2d = newCell.position2d();
+				let pixels2d = position2dToPixels2(position2d.x, position2d.y);
+
+				let cell = game.add.sprite(pixels2d.x, pixels2d.y, 'cell');
+				cell.scale.setTo(SCALE);
+				setAnchorMid(cell);
+				newCell = newCell.move_towards(Orientation.D,1);
+				console.log(newCell.stringify());
+			}
+			topCell = topCell.move_towards(Orientation.DR,1);
+		}
 
         //get position from server
         player = new Player(0,0);
@@ -155,7 +173,7 @@ var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, '', { preload
     }
     function position2dToPixels2(hex_x,hex_y){
 		let pix_coords = {};
-		pix_coords.x = SCALE *(Cell.HEIGHT * hex_x-20) +canvasWidth/2;
+		pix_coords.x = SCALE *(Cell.HEIGHT * hex_x) +canvasWidth/2;
 		pix_coords.y = SCALE *(Cell.HEIGHT * hex_y) + canvasHeight/2;
 		return pix_coords;
     }

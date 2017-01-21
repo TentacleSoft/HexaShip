@@ -10,11 +10,29 @@ let Orientation = {
     None: 0
 };
 
+function turn_right(orientation,factor){
+    let new_orientation = orientation + factor;
+    while(new_orientation > 6){
+		new_orientation-6;
+	}
+	while(new_orientation < 1){
+		new_orientation+6;
+	}
+	return new_orientation;
+}
+
+function turn_left(orientation,factor){
+    return turn_right(orientation,-factor);
+}
+
 class HexPosition {
     constructor(x,y,z) {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+    copy(){
+       return new HexPosition(this.x,this.y,this.z);
     }
     static unitary_vector(orientation){
         let x = 0, y = 0, z = 0;
