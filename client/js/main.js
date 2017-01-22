@@ -15,6 +15,8 @@ const OFFSET_X = 100 * SCALE;
 
 const blueCellColor = 0x0000ff;
 const redCellColor = 0xff0000;
+const gridWidth = 10;
+const gridHeight = 5;
 
 //Game stuff
 var socket;
@@ -69,9 +71,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
     function createFuckingGrid() {
         grid = {} ;
-        let gridWidth = 10,
-            gridHeight = 5,
-            movingDown = true,
+        let movingDown = true,
             topCell = new HexPosition(0, 0, 0);
 
         for (let column = 0; column < gridWidth; column++) {
@@ -198,6 +198,13 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
         graphics.clear();
         timer.render(graphics);
+
+        let hexpos = pixelstoHexPosition(game.input.x,game.input.y);
+        if(hexpos.within_box(gridWidth,gridHeight)){
+
+			grid[hexpos.x][hexpos.y][hexpos.z].alpha = 0.8;
+        }
+
     }
 
     function setAnchorMid(sprite) {
@@ -205,12 +212,34 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     	sprite.anchor.y = 0.5;
     }
 
-    function position2DToPixels(hex_x,hex_y){
+    function position2DToPixels(x,y){
 		let pix_coords = {},
-            offset = 50;
-		pix_coords.x = SCALE * (Cell.HEIGHT * hex_x) + 50 * SCALE + offset;
-		pix_coords.y = SCALE * (Cell.HEIGHT * hex_y) + 50 * SCALE + offset;
+        offset = 50;
+		pix_coords.x = SCALE * (Cell.HEIGHT * x) + 50 * SCALE + offset;
+		pix_coords.y = SCALE * (Cell.HEIGHT * y) + 50 * SCALE + offset;
 		return pix_coords;
+    }
+
+    function pixelstoHexPosition(px,py){
+        let position2D = {},
+        offset = 50;
+		position2D.x = (px - 50 * SCALE - offset)/SCALE/Cell.HEIGHT;
+		position2D.y = (py- 50 * SCALE - offset)/SCALE/Cell.HEIGHT;
+
+
+		col = Math.round(position2D.x/0.866);
+		x = col;
+		let odd_offset = 0;
+		if(x%2==1){
+			odd_offset = - 0.5;
+        }
+
+		row = Math.round(position2D.y+odd_offset);
+
+
+		z = row - (col - (col&1)) / 2;
+		y = -x-z;
+        return new HexPosition(x,y,z);
     }
 
     function renderShips() {

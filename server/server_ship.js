@@ -40,9 +40,7 @@ class Ship {
         var minimumDistance = 1000;
         var self = this;
         ships.forEach(function(ship){
-            console.log("shooting! to "+orientation);
-            console.log(ship);
-            if(self.position.straight_orientation_to(ship.position) == orientation){
+            if(self.position.straight_orientation_to(ship.position) == orientation && ship.status != "sunk"){
                 let distance = self.position.distance_to(ship.position)
                 if(distance < minimumDistance){
                     shipToHurt = ship;
@@ -52,12 +50,13 @@ class Ship {
 
         });
         if(shipToHurt){
-            console.log("player hurt! ");
+
             if(minimumDistance == 1) {
                 shipToHurt.hurt(2);
 			}else if(minimumDistance < 4) {
                 shipToHurt.hurt(1);
             }
+			console.log("player hurt! "+shipToHurt.health+" hp left");
         }
 
     }
