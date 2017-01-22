@@ -25,12 +25,15 @@ var maxActionsPerTurn = 3;
 var actionsDone = 0;
 var players = {};
 var ship;
+var predictionShip = null;
 
 const MOVING = 0;
 const WAITFORMOVES = 1;
 const WAITFORATTACK = 2;
 
 var game_status = WAITFORMOVES;
+
+var validMoves = {};
 
 var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
@@ -77,6 +80,27 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 		cursors = game.input.keyboard.createCursorKeys();
         createUI();
         createConnection();
+
+        game.input.onTap.add(function(){
+            selectTile() }, this );
+    }
+
+    function selectTile() {
+        let hexClick = pixelstoHexPosition(game.input.x,game.input.y);
+        if (predictionShip !== null){
+            if (game_status == WAITFORMOVES) {
+                console.log(validMoves);
+                if (typeof validMoves[hexClick.x] != "undefined" &&
+                    typeof validMoves[hexClick.x][hexClick.y] != "undefined" &&
+                    typeof validMoves[hexClick.x][hexClick.y][hexClick.z] != "undefined"){
+                        let orientation = predictionShip.position.straight_orientation_to(hexClick);
+                        predictionShip.move_towards(orientation);
+                        drawPredictionShip();
+                        socket.emit("move", orientation);
+                        calcPredictionValidMoves();
+                }       
+            }
+        }
     }
 
     function createSpriteGroups() {
@@ -135,9 +159,10 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         }
     }
 
+
     function showValidMoves(){
         if (typeof ship != "undefined") {
-            let greenTiles = ship.get_valid_moves();
+            let greenTiles = predictionShip.get_valid_moves();
             for (let i = 0; i < greenTiles.length; i++) {
                 grid[greenTiles[i].x][greenTiles[i].y][greenTiles[i].z].tint = validMoveColor;
             }
@@ -155,7 +180,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             for (let j = 0; j < attack_line[i].length; j++) {
                 let position = attack_line[i][j];
                 grid[position.x][position.y][position.z].tint = redCellColor;
-                grid[position.x][position.y][position.z].alpha = 0.9;
+                grid[position.x][position.y][position.z].alpha = 0.75;
             }
         }
 
@@ -368,10 +393,10 @@ function createConnection() {
             players[socketId].status = player.status;
         });
         renderShips();
-        console.log(data.step);
         //makeFuckingGridBlueAgain();
         if (data.step == 0) {
             game_status = MOVING;
+            destroyPredictionShip();
         }
         else if (data.step == 2) {
             game_status = WAITFORMOVES;
@@ -401,11 +426,55 @@ function addActionDone() {
 
 function resetActions() {
     actionsDone = 0;
+    let pos = ship.getPosition();
+    predictionShip = new Ship (pos.x, pos.y, pos.z, ship.getOrientation());
+    predictionShip.sprite = sprites.ships.create(0, 0, 'playership');
+    drawPredictionShip();
+    calcPredictionValidMoves();
 }
+
+function drawPredictionShip() {
+    setAnchorMid(predictionShip.sprite);
+    predictionShip.sprite.scale.setTo(SCALE);
+    predictionShip.sprite.alpha = 0.75;
+    predictionShip.sprite.angle = (predictionShip.getOrientation() - 1) * 60;
+
+    let predictionShip_hex_position = predictionShip.getPosition();
+    let predictionShip_2d_position = predictionShip_hex_position.position2d();
+    predictionShip_2d_position = position2DToPixels(predictionShip_2d_position.x,predictionShip_2d_position.y);
+    predictionShip.sprite.x = predictionShip_2d_position.x;
+    predictionShip.sprite.y = predictionShip_2d_position.y;
+
+}
+
+function destroyPredictionShip() {
+    if (predictionShip != null)
+        predictionShip.sprite.destroy();
+    predictionShip = null;
+}
+
 function actionsLeft() {
         return maxActionsPerTurn - actionsDone;
 }
 
 function renderActionsLeft() {
     actionsLeftText.setText('Accions restants: ' + actionsLeft());
+}
+
+function calcPredictionValidMoves() {
+    if (predictionShip !== null) {
+            let valid = predictionShip.get_valid_moves();
+            validMoves = {};
+            console.log("calc valid moves");
+            console.log(valid);
+            for (let i = 0; i < valid.length; i++) {
+                if (typeof validMoves[valid[i].x] == "undefined") {
+                    validMoves[valid[i].x] = {};
+                }
+                if (typeof validMoves[valid[i].x][valid[i].y] == "undefined") {
+                    validMoves[valid[i].x][valid[i].y] = {};
+                }
+                validMoves[valid[i].x][valid[i].y][valid[i].z] = 0;
+            }
+        }
 }
