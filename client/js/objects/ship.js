@@ -14,6 +14,10 @@ class Ship {
         return pos.get_back_side_lines(this.orientation,CANNON_RANGE) + pos.get_front_side_lines(this.orientation,CANNON_RANGE)
     }
 
+	get_valid_moves(){
+		return pos.get_back_side_lines(this.orientation,1) + pos.get_front_side_lines(this.orientation,1) + pos.get_line_towards(this.orientation,1)
+	}
+
     move_towards(orientation) {
         this.position = this.position.move_towards(orientation, 1)
     }
