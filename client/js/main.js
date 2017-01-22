@@ -55,6 +55,8 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
         // TODO give attribution https://www.freesound.org/people/baefild/sounds/91293/
         game.load.audio('cannon', ['assets/sound/cannon.mp3']);
+        // TODO attribute https://www.freesound.org/people/LXX.70/sounds/91071/
+        game.load.audio('ambiance', ['assets/sound/ambiance.mp3']);
     }
 
     var cursors;
@@ -66,6 +68,10 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
     function create () {
         createSpriteGroups();
+
+        let background = game.add.audio('ambiance');
+        background.play();
+
         createBackground();
         createFuckingGrid();
 		cursors = game.input.keyboard.createCursorKeys();
