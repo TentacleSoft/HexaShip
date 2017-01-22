@@ -22,7 +22,19 @@ class Timer  {
             }
         }
         this.timer.width = this.maxWidth * left;
-        graphics.beginFill(0x33cc33);
+
+        let red = 0xff0000;
+        let green = 0x00ff00;
+        /*
+        left = 1 => red = 0;
+        left = 0.5 => red = 255
+        left = 0.5 => green = 255
+        left = 0 => green
+
+         */
+        if (left > 0.5) red = 256* 256 * Math.trunc((1 - left) * 2 * 255);
+        else green = 256 * Math.trunc(255*left * 2);
+        graphics.beginFill(red + green);
         graphics.drawPolygon([this.timer.bottomLeft, this.timer.bottomRight, this.timer.topRight, this.timer.topLeft]);
         graphics.endFill();
     }
