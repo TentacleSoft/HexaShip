@@ -54,15 +54,11 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         game.load.image('button_pressed', '../assets/button_pressed.png');
         game.load.image('misile_button', '../assets/misile_button.png');
 
-        // TODO give attribution notice for Ivan Voirol : http://opengameart.org/content/basic-map-32x32-by-silver-iv
         game.load.spritesheet('beach', 'assets/beachmap.png', 32, 32);
 
-        // TODO give attribution http://www.dafont.com/upheaval.font
         game.load.bitmapFont('font', 'assets/bitmapFonts/font.png', 'assets/bitmapFonts/font.fnt');
 
-        // TODO give attribution https://www.freesound.org/people/baefild/sounds/91293/
         game.load.audio('cannon', ['assets/sound/cannon.mp3']);
-        // TODO attribute https://www.freesound.org/people/LXX.70/sounds/91071/
         game.load.audio('ambiance', ['assets/sound/ambiance.mp3']);
     }
 
