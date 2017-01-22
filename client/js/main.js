@@ -15,12 +15,15 @@ const OFFSET_X = 100 * SCALE;
 
 const blueCellColor = 0x0000ff;
 const redCellColor = 0xff0000;
+const validMoveColor = 0x77ff77;
 const gridWidth = 10;
 const gridHeight = 5;
 
 //Game stuff
 var socket;
 var players = {};
+var ship;
+
 var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 
@@ -103,6 +106,15 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                     gridj[k].tint = blueCellColor;
                     gridj[k].alpha = 0.75;
                 }
+            }
+        }
+    }
+
+    function showValidMoves(){
+        if (typeof ship != "undefined") {
+            let greenTiles = ship.get_valid_moves();
+            for (let i = 0; i < greenTiles.length; i++) {
+                grid[greenTiles[i].x][greenTiles[i].y][greenTiles[i].z].tint = validMoveColor;
             }
         }
     }
@@ -197,7 +209,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             if (doSleep) {
                 sleepEnds = currentTime + 500;
             }
-            console.log("Mouse coords: " + game.input.x + ", " + game.input.y)
+            //console.log("Mouse coords: " + game.input.x + ", " + game.input.y)
         }
 
         graphics.clear();
@@ -274,9 +286,18 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             else if (typeof players[p].sprite !== "undefined") {
                 players[p].sprite.destroy();
                 delete players[p].sprite;
+                delete ship;
+            }
+
+            if (players[p].team === "you" && players[p].status != "sunk") {
+                createPlayerShip(players[p].position, players[p].orientation)
             }
         };
-        makeFuckingGridBlueAgain();
+    }
+
+    function createPlayerShip(position, orientation) {
+        delete ship;
+        ship = new Ship(position.x, position.y, position.z, orientation);
     }
 
 
@@ -302,6 +323,7 @@ function createConnection() {
             players[socketId].status = player.status;
         });
         renderShips();
+        showValidMoves();
     });
 
     socket.on('disconnected', function (id) {
@@ -313,5 +335,6 @@ function createConnection() {
     socket.on('turn_start', function (turnDuration) {
         console.log('turn start! Duration: ' + turnDuration);
         timer.start(turnDuration * 1000);
+        makeFuckingGridBlueAgain();
     });
 }

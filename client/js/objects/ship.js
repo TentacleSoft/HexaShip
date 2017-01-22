@@ -1,9 +1,9 @@
 CANNON_RANGE = 3
 
 class Ship {
-    constructor(x, y, z) {
+    constructor(x, y, z, orientation) {
         this.position = new HexPosition(x, y, z);
-        this.orientation = Orientation.U;
+        this.orientation = orientation;
     }
 
     setOrientation(orientation) {
@@ -11,11 +11,14 @@ class Ship {
     }
 
     get_all_canons(){
-        return pos.get_back_side_lines(this.orientation,CANNON_RANGE) + pos.get_front_side_lines(this.orientation,CANNON_RANGE)
+        return this.position.get_back_side_lines(this.orientation,CANNON_RANGE).concat(this.position.get_front_side_lines(this.orientation,CANNON_RANGE));
     }
 
 	get_valid_moves(){
-		return pos.get_back_side_lines(this.orientation,1) + pos.get_front_side_lines(this.orientation,1) + pos.get_line_towards(this.orientation,1)
+		let lines = this.position.get_back_side_lines(this.orientation,2).concat(this.position.get_front_side_lines(this.orientation,2));
+        lines.push(this.position.get_line_towards(this.orientation,2));
+        let cells = [].concat.apply([],lines);
+        return cells;
 	}
 
     move_towards(orientation) {
