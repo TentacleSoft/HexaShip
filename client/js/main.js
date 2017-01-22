@@ -24,6 +24,12 @@ var socket;
 var players = {};
 var ship;
 
+const MOVING = 0;
+const WAITFORMOVES = 1;
+const WAITFORATTACK = 2;
+
+var game_status = WAITFORMOVES;
+
 var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 
@@ -94,7 +100,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             movingDown = !movingDown;
         }
 
-        makeFuckingGridBlueAgain();
     }
 
     function makeFuckingGridBlueAgain() {
@@ -108,6 +113,12 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 }
             }
         }
+        if (game_status == WAITFORMOVES){
+            showValidMoves();
+        }
+        if (game_status == WAITFORATTACK){
+            showAttackTiles();
+        }
     }
 
     function showValidMoves(){
@@ -117,6 +128,22 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 grid[greenTiles[i].x][greenTiles[i].y][greenTiles[i].z].tint = validMoveColor;
             }
         }
+    }
+
+    function showAttackTiles() {
+        let player = players[socket.id];
+        let position = new HexPosition(player.position.x, player.position.y, player.position.z);
+        let attack_line = position.get_front_side_lines(player.orientation,3);
+
+        for (let i = 0; i < attack_line.length; i++) {
+            for (let j = 0; j < attack_line[i].length; j++) {
+                let position = attack_line[i][j];
+                grid[position.x][position.y][position.z].tint = redCellColor;
+                grid[position.x][position.y][position.z].alpha = 0.9;
+            }
+        }
+        //socket.emit("shoot",turn_left(player.orientation));
+        //socket.emit("shoot",turn_right(player.orientation));
     }
 
     function addSpriteToGrid(grid,x,y,z,sprite){
@@ -174,19 +201,12 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     }
 
     function onClickAttack() {
-        let player = players[socket.id];
-        let position = new HexPosition(player.position.x, player.position.y, player.position.z);
-        let attack_line = position.get_front_side_lines(player.orientation,3);
-
-        for (let i = 0; i < attack_line.length; i++) {
-            for (let j = 0; j < attack_line[i].length; j++) {
-                let position = attack_line[i][j];
-                grid[position.x][position.y][position.z].tint = redCellColor;
-                grid[position.x][position.y][position.z].alpha = 0.9;
-            }
+        if (game_status == WAITFORMOVES) {
+            game_status = WAITFORATTACK;
         }
-        socket.emit("shoot",turn_left(player.orientation));
-        socket.emit("shoot",turn_right(player.orientation));
+        else if (game_status == WAITFORATTACK) {
+            game_status = WAITFORMOVES;
+        }
     }
 
     var sleepEnds = 0;
@@ -212,13 +232,14 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             //console.log("Mouse coords: " + game.input.x + ", " + game.input.y)
         }
 
+        makeFuckingGridBlueAgain();
         graphics.clear();
         timer.render(graphics);
 
         let hexpos = pixelstoHexPosition(game.input.x,game.input.y);
         if(hexpos.within_box(gridWidth,gridHeight)){
 
-			grid[hexpos.x][hexpos.y][hexpos.z].alpha = 0.8;
+			grid[hexpos.x][hexpos.y][hexpos.z].alpha = 1;
         }
 
     }
@@ -323,7 +344,14 @@ function createConnection() {
             players[socketId].status = player.status;
         });
         renderShips();
-        showValidMoves();
+        console.log(data.step);
+        //makeFuckingGridBlueAgain();
+        if (data.step == 0) {
+            game_status = MOVING;
+        }
+        else if (data.step == 2) {
+            game_status = WAITFORMOVES;
+        }
     });
 
     socket.on('disconnected', function (id) {
@@ -335,6 +363,5 @@ function createConnection() {
     socket.on('turn_start', function (turnDuration) {
         console.log('turn start! Duration: ' + turnDuration);
         timer.start(turnDuration * 1000);
-        makeFuckingGridBlueAgain();
     });
 }

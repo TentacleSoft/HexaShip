@@ -1,5 +1,8 @@
 "use strict";
 
+const WAITFORMOVES = 0;
+const MOVING = 1;
+
 var Player = require("./server/player"),
     HexPositions = require("./client/js/objects/hexpositions"),
     HexPosition = HexPositions.position,
@@ -36,11 +39,15 @@ io.on('connection',function (socket) {
     socket.emit('onconnected', {id: socket.id});
 
     socket.on('move', function (orientation) {
-        players[socket.id].orders.push({type: 'move', orientation: orientation});
+        if (status == WAITFORMOVES){
+            players[socket.id].orders.push({type: 'move', orientation: orientation});
+        }
     });
 
     socket.on('shoot', function (orientation) {
-		players[socket.id].orders.push({type: 'shoot', orientation: orientation});
+        if (status == WAITFORMOVES){
+		  players[socket.id].orders.push({type: 'shoot', orientation: orientation});
+        }
 
     });
 
@@ -55,13 +62,14 @@ io.on('connection',function (socket) {
 });
 
 const turnDuration = 5;
+const stepsPerTurn = 3;
 
+var status = WAITFORMOVES;
 
 var turn = function () {
-    notifyTurnStart();
-
-    for (var step = 0; step < 3; step++) { // TODO use OrderQueue.size
-        setTimeout(function () {
+    status = MOVING;
+    for (var step = 0; step < stepsPerTurn; step++) { // TODO use OrderQueue.size
+        setTimeout(function (step) {
             for (var i in players) {
                 var player = players[i];
 
@@ -70,7 +78,12 @@ var turn = function () {
                     processOrder(i, order);
                 }
             }
-        }, step * 1000);
+        sendGameState(step);
+        if (step == 2) {
+            status = WAITFORMOVES;
+            notifyTurnStart();
+        }
+        }, step * 1000, step);
     }
 };
 
@@ -104,7 +117,7 @@ function processOrder(playerId, order) {
     }
 }
 
-var sendGameState = function () {
+var sendGameState = function (step) {
     for (var i in players) {
         var gamestate = {players: []};
         for (var j in players) {
@@ -118,10 +131,9 @@ var sendGameState = function () {
                 team: i === player.socket.id ? 'you' : 'enemy'
             });
         }
-
+        gamestate.step = step;
         players[i].socket.emit("gamestate", gamestate);
     }
 };
 
-setInterval(turn, turnDuration * 1000);
-setInterval(sendGameState, 1000);
+setInterval(turn, (turnDuration + stepsPerTurn - 1) * 1000);
