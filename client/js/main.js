@@ -217,18 +217,22 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         }
     }
 
-    var sleepEnds = 0;
+    let currentKey = null;
     function update() {
-        let currentTime = new Date().getTime();
-        if (sleepEnds < currentTime && canActionBeDone()) {
+        if (currentKey === null || !currentKey.isDown) {
+            currentKey = null;
             let movementDone = true;
             if (cursors.up.isDown) {
+                currentKey = cursors.up;
                 socket.emit("move", Orientation.U);
             } else if (cursors.right.isDown) {
+                currentKey = cursors.right;
                 socket.emit("move", Orientation.UR);
             } else if (cursors.left.isDown) {
+                currentKey = cursors.left;
                 socket.emit("move", Orientation.DL);
             } else if (cursors.down.isDown) {
+                currentKey = cursors.down;
                 socket.emit("move", Orientation.D);
             } else {
                 movementDone = false;
@@ -236,9 +240,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
             if (movementDone) {
                 addActionDone();
-                sleepEnds = currentTime + 500;
             }
-            //console.log("Mouse coords: " + game.input.x + ", " + game.input.y)
         }
 
         makeFuckingGridBlueAgain();
