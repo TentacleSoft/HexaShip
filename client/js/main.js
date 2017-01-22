@@ -136,6 +136,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
       }
     }
 
+    var timer;
     function createUI() {
         var missile_border = sprites.ui.create(canvasWidth - OFFSET_X, OFFSET_X, 'button');
         setAnchorMid(missile_border);
@@ -151,6 +152,11 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         missile.inputEnabled = true;
         missile.input.useHandCursor = true;
         missile.events.onInputDown.add(onClickAttack, this);
+
+        let maxWidth = availableWidth;
+        timer = new Timer(maxWidth, 0, 0);
+
+        graphics = game.add.graphics(0, 0);
     }
 
     function onClickAttack() {
@@ -167,9 +173,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         socket.emit("shoot",turn_left(player.orientation));
         socket.emit("shoot",turn_right(player.orientation));
     }
-
-
-
 
     var sleepEnds = 0;
     function update() {
@@ -192,6 +195,9 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 sleepEnds = currentTime + 500;
             }
         }
+
+        graphics.clear();
+        timer.render(graphics);
     }
 
     function setAnchorMid(sprite) {
@@ -269,5 +275,10 @@ function createConnection() {
         console.log('Que covard! el ' + id + ' s\'ha desconnectat!');
         players[id].sprite.destroy();
         delete players[id];
+    });
+
+    socket.on('turn_start', function (turnDuration) {
+        console.log('turn start! Duration: ' + turnDuration);
+        timer.start(turnDuration * 1000);
     });
 }
