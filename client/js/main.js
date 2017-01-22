@@ -97,6 +97,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                         predictionShip.move_towards(orientation);
                         drawPredictionShip();
                         socket.emit("move", orientation);
+                        addActionDone();
                         calcPredictionValidMoves();
                 }       
             }
@@ -161,7 +162,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
 
     function showValidMoves(){
-        if (typeof ship != "undefined") {
+        if (predictionShip !== null && canActionBeDone()) {
             let greenTiles = predictionShip.get_valid_moves();
             for (let i = 0; i < greenTiles.length; i++) {
                 grid[greenTiles[i].x][greenTiles[i].y][greenTiles[i].z].tint = validMoveColor;
@@ -462,7 +463,10 @@ function renderActionsLeft() {
 }
 
 function calcPredictionValidMoves() {
-    if (predictionShip !== null) {
+    if (!canActionBeDone()){
+        validMoves = {};
+    }
+    else if (predictionShip !== null) {
             let valid = predictionShip.get_valid_moves();
             validMoves = {};
             console.log("calc valid moves");
