@@ -62,13 +62,10 @@ io.on('connection',function (socket) {
 const turnDuration = 10;
 
 var turn = function () {
-    console.log('Processing turn...');
-
     notifyTurnStart();
 
     for (var step = 0; step < 3; step++) { // TODO use OrderQueue.size
         setTimeout(function () {
-            console.log('  > Processing order');
             for (var i in players) {
                 var player = players[i];
 
