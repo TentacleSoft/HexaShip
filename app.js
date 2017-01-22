@@ -30,11 +30,33 @@ app.get('/*', function (req, res, next) {
 });
 
 var players = {};
-
+// get random number between min (included) and max (excluded)
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
 io.on('connection',function (socket) {
     console.log('Connected: ' + socket.id);
 
-    players[socket.id] = new Player(new Ship(0, 0, 0), socket);
+    var topCellX = getRandomInt(0, 9 + 1);
+    var topCellY = 0;
+    var topCellZ = 0;
+    if (topCellX %2 === 1) {
+        topCellY = -(topCellX+1)/2;
+        topCellZ = -(topCellX-1)/2;
+    } else {
+        topCellY = -topCellX/2;
+        topCellZ = -topCellX/2;
+    }
+
+    var topCell = new HexPosition(topCellX, topCellY, topCellZ);
+    let orientationD = 4; // TODO hardcoded
+    var resultingPosition = topCell.move_towards(orientationD, getRandomInt(0, 4 + 1));
+    // MAX WIDTH and MAX HEIGHT are hardcoded here as 9 and 4
+
+    players[socket.id] = new Player(
+        new Ship(resultingPosition.x, resultingPosition.y, resultingPosition.z),
+        socket
+    );
 
     socket.emit('onconnected', {id: socket.id});
 
