@@ -84,10 +84,13 @@ var turn = function () {
         sendGameState(step);
         if (step == 2) {
             status = WAITFORMOVES;
-            notifyTurnStart();
         }
         }, step * 1000, step);
     }
+    //after send all steps, send a signal to start animations
+    setTimeout(function () {
+        notifyTurnStart();
+    }, step * 1000);
 };
 
 function notifyTurnStart() {
@@ -139,4 +142,4 @@ var sendGameState = function (step) {
     }
 };
 
-setInterval(turn, (turnDuration + stepsPerTurn - 1) * 1000);
+setInterval(turn, (turnDuration + stepsPerTurn) * 1000);

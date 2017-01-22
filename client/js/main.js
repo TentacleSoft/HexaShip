@@ -481,9 +481,6 @@ function createConnection() {
             game_status = MOVING;
             destroyPredictionShip();
         }
-        else if (data.step == 2) {
-            game_status = WAITFORMOVES;
-        }
     });
 
     socket.on('disconnected', function (id) {
@@ -497,6 +494,7 @@ function createConnection() {
         resetActions();
         timer.start(turnDuration * 1000);
     });
+
 }
 
 function canActionBeDone() {
@@ -508,6 +506,7 @@ function addActionDone() {
 }
 
 function resetActions() {
+    game_status = WAITFORMOVES;
     actionsDone = 0;
     let pos = ship.getPosition();
     predictionShip = new Ship (pos.x, pos.y, pos.z, ship.getOrientation());
