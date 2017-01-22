@@ -226,7 +226,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             if (players[p].status != "sunk") {
                 let player_hex_position = new HexPosition(players[p].position.x, players[p].position.y, players[p].position.z);
                 let player_2d_position = player_hex_position.position2d();
-                player_2d_position = position2dToPixels2(player_2d_position.x,player_2d_position.y);
+                player_2d_position = position2dToPixels(player_2d_position.x,player_2d_position.y);
                 players[p].sprite.x = player_2d_position.x;
                 players[p].sprite.y = player_2d_position.y;
 
