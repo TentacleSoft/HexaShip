@@ -292,6 +292,16 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         }
 
         renderActionsLeft();
+
+        for (let index in players) {
+            let player = players[index];
+            if (typeof player !== "undefined" && typeof player.health !== "undefined") {
+                player.health.render(graphics);
+            } else {
+                console.log("health is undefined");
+                console.log(player);
+            }
+        }
     }
 
     function setAnchorMid(sprite) {
@@ -351,6 +361,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 player_2d_position = position2DToPixels(player_2d_position.x,player_2d_position.y);
                 players[p].sprite.x = player_2d_position.x;
                 players[p].sprite.y = player_2d_position.y;
+                players[p].health.updatePosition(player_2d_position.x, player_2d_position.y);
 
                 players[p].sprite.angle = (players[p].orientation - 1) * 60;
             }
@@ -381,17 +392,19 @@ function createConnection() {
     });
 
     socket.on('gamestate', function (data) {
-
-        //console.log('Received game state', data);
         data.players.forEach(function (player) {
             let socketId = player.id;
             if (typeof players[socketId] === "undefined") {
-                players[socketId] = {};
+                players[socketId] = {
+                    health: new Health(),
+                };
             }
             players[socketId].team = player.team;
             players[socketId].position = player.position;
             players[socketId].orientation = player.orientation;
             players[socketId].status = player.status;
+            players[socketId].health.updateHealth(player.health);
+
         });
         renderShips();
         //makeFuckingGridBlueAgain();
