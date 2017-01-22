@@ -195,7 +195,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     }
 
     var timer;
-    var text;
+    var actionsLeftText;
     function createUI() {
         var missile_border = sprites.ui.create(canvasWidth - OFFSET_X, OFFSET_X, 'button');
         setAnchorMid(missile_border);
