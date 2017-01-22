@@ -81,7 +81,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 let pixels2d = position2DToPixels(position2d.x, position2d.y);
 
                 let cell = sprites.grid.create(pixels2d.x, pixels2d.y, 'cell');
-                cell.tint = blueCellColor;
                 cell.scale.setTo(SCALE);
                 setAnchorMid(cell);
                 addSpriteToGrid(grid, newCell.x, newCell.y, newCell.z, cell);
@@ -91,6 +90,8 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             topCell = movingDown ? topCell.move_towards(Orientation.DR, 1) : topCell.move_towards(Orientation.UR, 1);
             movingDown = !movingDown;
         }
+
+        makeFuckingGridBlueAgain();
     }
 
     function makeFuckingGridBlueAgain() {
@@ -100,6 +101,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 let gridj = gridi[j];
                 for (let k in gridj) {
                     gridj[k].tint = blueCellColor;
+                    gridj[k].alpha = 0.75;
                 }
             }
         }
@@ -168,6 +170,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             for (let j = 0; j < attack_line[i].length; j++) {
                 let position = attack_line[i][j];
                 grid[position.x][position.y][position.z].tint = redCellColor;
+                grid[position.x][position.y][position.z].alpha = 0.9;
             }
         }
         socket.emit("shoot",turn_left(player.orientation));
@@ -194,6 +197,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             if (doSleep) {
                 sleepEnds = currentTime + 500;
             }
+            console.log("Mouse coords: " + game.input.x + ", " + game.input.y)
         }
 
         graphics.clear();
