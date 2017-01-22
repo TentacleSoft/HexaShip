@@ -4,6 +4,23 @@ var HexPositions = require('./../client/js/objects/hexpositions'),
 
 HEALTH = 3;
 
+function array_of_arrays_to_array(arr){
+	return cells = [].concat.apply([],arr);
+}
+
+function turn_right(orientation,factor){
+	if(!factor) factor = 1;
+	let new_orientation = orientation + factor;
+	while(new_orientation > 6){
+		new_orientation -= 6;
+	}
+	while(new_orientation < 1){
+		new_orientation += 6;
+	}
+	return new_orientation;
+}
+
+
 class Ship {
     constructor(x, y, z) {
         this.position = new HexPosition(x, y, z);
@@ -17,6 +34,16 @@ class Ship {
     }
 
     move_towards(orientation,ships) {
+
+		if(orientation == turn_right(this.orientation,3)){
+			return;
+		}
+		if(orientation == turn_right(this.orientation,2) || orientation == turn_right(this.orientation,4)){
+			this.orientation = orientation;
+			return;
+		}
+		this.orientation = orientation;
+
 		var new_position = this.position.move_towards(orientation, 1);
 		var self = this;
 		var blocked = false;
@@ -27,7 +54,6 @@ class Ship {
 		});
 
 		if(!blocked && new_position.within_box()){
-
 			let valid_moves = this.get_valid_moves();
 			for(let i = 0; i < valid_moves.length; i++ ){
 				if(valid_moves[i].equals(new_position)){
@@ -44,11 +70,12 @@ class Ship {
 			console.log("ship sunk!")
         }
     }
+
+
 	get_valid_moves(){
 		let lines = this.position.get_back_side_lines(this.orientation,2).concat(this.position.get_front_side_lines(this.orientation,2));
 		lines.push(this.position.get_line_towards(this.orientation,2));
-		let cells = [].concat.apply([],lines);
-		return cells;
+		return array_of_arrays_to_array(lines);
 	}
 
     getPosition() {
@@ -59,12 +86,23 @@ class Ship {
         return this.orientation;
     }
 
-
+	get_canon_lines(){
+		return this.position.get_back_side_lines(this.orientation,CANNON_RANGE).concat(this.position.get_front_side_lines(this.orientation,CANNON_RANGE));
+	}
 
     shoot(orientation,ships){
         var shipToHurt = false;
         var minimumDistance = 1000;
         var self = this;
+
+        if(this.position.get_side_orientations(this.orientation).indexOf(orientation) >= 0){
+
+			console.log("shoot");
+		}else{
+			console.log("invalid shoot!");
+        	return;
+		}
+
         ships.forEach(function(ship){
             if(self.position.straight_orientation_to(ship.position) == orientation && ship.status != "sunk"){
                 let distance = self.position.distance_to(ship.position)
@@ -78,7 +116,7 @@ class Ship {
         if(shipToHurt){
 
             if(minimumDistance == 1) {
-                shipToHurt.hurt(2);
+                shipToHurt.hurt(3);
 			}else if(minimumDistance < 4) {
                 shipToHurt.hurt(1);
             }

@@ -30,6 +30,10 @@ function turn_left(orientation,factor){
     return turn_right(orientation,-factor);
 }
 
+function array_of_arrays_to_array(arr){
+	return [].concat.apply([],arr);
+}
+
 class HexPosition {
     constructor(x, y, z) {
         this.x = x;
@@ -206,11 +210,31 @@ class HexPosition {
     within_center(boardLength){
         return this.cardinality() <= boardLength;
     }
+
+    get_lines_from_orientations(orientations,length){
+        var lines = [];
+        for(var i = 0; i < orientations.length; i++){
+            lines.push(this.get_line_towards(orientations[i],length))
+        }
+        return lines;
+    }
+
+    get_side_orientations(orientation){
+        return [turn_left(orientation,1),turn_left(orientation,2),turn_right(orientation,1),turn_right(orientation,2)];
+    }
+    get_front_and_side_orientations(orientation){
+        return this.get_side_orientations(orientation).concat([orientation]);
+    }
+    get_valid_move_cells(orientation){
+        return array_of_arrays_to_array(this.get_lines_from_orientations(this.get_front_and_side_orientations(orientation),2));
+    }
+
     get_front_side_lines(orientation,length){
-        return [this.get_line_towards(turn_left(orientation,1),length),this.get_line_towards(turn_right(orientation,1),length)];
+		//return [this.get_line_towards(turn_left(orientation,2),length),this.get_line_towards(turn_right(orientation,2),length)];
+        return this.get_lines_from_orientations([turn_left(orientation,1),turn_right(orientation,1)],length);
     }
 	get_back_side_lines(orientation,length){
-		return [this.get_line_towards(turn_left(orientation,2),length),this.get_line_towards(turn_right(orientation,2),length)];
+		return this.get_lines_from_orientations([turn_left(orientation,2),turn_right(orientation,2)],length);
 	}
 
 

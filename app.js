@@ -105,7 +105,6 @@ function processOrder(playerId, order) {
         case 'move':
             // TODO validate orientation and movement
             players[playerId].ship.move_towards(order.orientation,ships);
-            players[playerId].ship.setOrientation(order.orientation);
             break;
         case 'shoot':
 
@@ -128,6 +127,7 @@ var sendGameState = function (step) {
                 orientation: player.ship.orientation,
                 position: player.ship.position,
 				status: player.ship.status,
+				health: player.ship.health,
                 team: i === player.socket.id ? 'you' : 'enemy'
             });
         }
