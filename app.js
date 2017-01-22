@@ -72,7 +72,10 @@ var turn = function () {
         setTimeout(function (step) {
             for (var i in players) {
                 var player = players[i];
-
+                if(player.ship.status != 'sunk'){
+					player.ship.status = 'alive';
+					player.ship.shoot_orientation = '';
+                }
                 var order = player.orders.pop();
                 if (typeof order !== "undefined") {
                     processOrder(i, order);
@@ -107,7 +110,6 @@ function processOrder(playerId, order) {
             players[playerId].ship.move_towards(order.orientation,ships);
             break;
         case 'shoot':
-
 			players[playerId].ship.shoot(order.orientation, ships);
             break;
         default:
@@ -128,6 +130,7 @@ var sendGameState = function (step) {
                 position: player.ship.position,
 				status: player.ship.status,
 				health: player.ship.health,
+                shoot_orientation: player.ship.shoot_orientation,
                 team: i === player.socket.id ? 'you' : 'enemy'
             });
         }

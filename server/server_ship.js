@@ -27,6 +27,7 @@ class Ship {
         this.orientation = Orientation.D;
         this.health = HEALTH;
         this.status = "alive";
+        this.shoot_orientation = Orientation.None;
     }
 
     setOrientation(orientation) {
@@ -102,7 +103,8 @@ class Ship {
 			console.log("invalid shoot!");
         	return;
 		}
-
+		this.shoot_orientation = orientation;
+        this.status = "shooting";
         ships.forEach(function(ship){
             if(self.position.straight_orientation_to(ship.position) == orientation && ship.status != "sunk"){
                 let distance = self.position.distance_to(ship.position)

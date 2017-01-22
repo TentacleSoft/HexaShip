@@ -100,7 +100,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                         socket.emit("move", orientation);
                         addActionDone();
                         calcPredictionValidMoves();
-                }       
+                }
             }
             else if (game_status == WAITFORATTACK) {
                 if (typeof attackHex2Dir[hexClick.x] != "undefined" &&
@@ -391,6 +391,9 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
     function renderShips() {
         for (let p in players) {
+            if( players[p].status == "shooting"){
+                console.log("player is shooting towards "+players[p].shoot_orientation);
+            }
             if (typeof players[p].sprite === "undefined" && players[p].status != "sunk"){
                 if (players[p].team === "you"){
                     players[p].sprite = sprites.ships.create(0, 0, 'playership');
@@ -452,6 +455,7 @@ function createConnection() {
             players[socketId].team = player.team;
             players[socketId].position = player.position;
             players[socketId].orientation = player.orientation;
+			players[socketId].shoot_orientation = player.shoot_orientation;
             players[socketId].status = player.status;
             players[socketId].health.updateHealth(player.health);
 
