@@ -21,6 +21,8 @@ const gridHeight = 5;
 
 //Game stuff
 var socket;
+var maxActionsPerTurn = 3;
+var actionsDone = 0;
 var players = {};
 var ship;
 
@@ -47,6 +49,9 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
         // TODO give attribution notice for Ivan Voirol : http://opengameart.org/content/basic-map-32x32-by-silver-iv
         game.load.spritesheet('beach', 'assets/beachmap.png', 32, 32);
+
+        // TODO give attribution http://www.dafont.com/upheaval.font
+        game.load.bitmapFont('font', 'assets/bitmapFonts/font.png', 'assets/bitmapFonts/font.fnt');
     }
 
     var cursors;
@@ -178,6 +183,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     }
 
     var timer;
+    var text;
     function createUI() {
         var missile_border = sprites.ui.create(canvasWidth - OFFSET_X, OFFSET_X, 'button');
         setAnchorMid(missile_border);
@@ -197,6 +203,8 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         let maxWidth = availableWidth;
         timer = new Timer(maxWidth, 0, 0);
 
+        actionsLeftText = game.add.bitmapText(canvasWidth - OFFSET_X + 250 * SCALE, OFFSET_X, 'font','Accions restants: 99999', 32);
+
         graphics = game.add.graphics(0, 0);
     }
 
@@ -211,9 +219,9 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
     var sleepEnds = 0;
     function update() {
-        let doSleep = true;
         let currentTime = new Date().getTime();
-        if (sleepEnds < currentTime) {
+        if (sleepEnds < currentTime && canActionBeDone()) {
+            let movementDone = true;
             if (cursors.up.isDown) {
                 socket.emit("move", Orientation.U);
             } else if (cursors.right.isDown) {
@@ -223,10 +231,11 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             } else if (cursors.down.isDown) {
                 socket.emit("move", Orientation.D);
             } else {
-                doSleep = false;
+                movementDone = false;
             }
 
-            if (doSleep) {
+            if (movementDone) {
+                addActionDone();
                 sleepEnds = currentTime + 500;
             }
             //console.log("Mouse coords: " + game.input.x + ", " + game.input.y)
@@ -242,6 +251,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 			grid[hexpos.x][hexpos.y][hexpos.z].alpha = 1;
         }
 
+        renderActionsLeft();
     }
 
     function setAnchorMid(sprite) {
@@ -362,6 +372,26 @@ function createConnection() {
 
     socket.on('turn_start', function (turnDuration) {
         console.log('turn start! Duration: ' + turnDuration);
+        resetActions();
         timer.start(turnDuration * 1000);
     });
+}
+
+function canActionBeDone() {
+    return maxActionsPerTurn > actionsDone;
+}
+
+function addActionDone() {
+    actionsDone++;
+}
+
+function resetActions() {
+    actionsDone = 0;
+}
+function actionsLeft() {
+        return maxActionsPerTurn - actionsDone;
+}
+
+function renderActionsLeft() {
+    actionsLeftText.setText('Accions restants: ' + actionsLeft());
 }
