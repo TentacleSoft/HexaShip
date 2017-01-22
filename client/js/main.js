@@ -174,21 +174,27 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         }
 
 
-        function update () {
-        let timeToSleep = 500;
-    	if (cursors.up.isDown) {
-			socket.emit("move",Orientation.U);
-        } else if (cursors.right.isDown) {
-			socket.emit("move",Orientation.UR);
-        } else if (cursors.left.isDown) {
-			socket.emit("move",Orientation.DL);
-        } else if (cursors.down.isDown) {
-			socket.emit("move",Orientation.D);
-		}else{
-    	    time_to_sleep = 0
-        }
-        sleep(500);
+    var sleepEnds = 0;
+    function update() {
+        let doSleep = true;
+        let currentTime = new Date().getTime();
+        if (sleepEnds < currentTime) {
+            if (cursors.up.isDown) {
+                socket.emit("move", Orientation.U);
+            } else if (cursors.right.isDown) {
+                socket.emit("move", Orientation.UR);
+            } else if (cursors.left.isDown) {
+                socket.emit("move", Orientation.DL);
+            } else if (cursors.down.isDown) {
+                socket.emit("move", Orientation.D);
+            } else {
+                doSleep = false;
+            }
 
+            if (doSleep) {
+                sleepEnds = currentTime + 500;
+            }
+        }
     }
 
     function setAnchorMid(sprite) {
