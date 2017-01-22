@@ -508,13 +508,16 @@ function addActionDone() {
 function resetActions() {
     game_status = WAITFORMOVES;
     actionsDone = 0;
-    let pos = ship.getPosition();
-    predictionShip = new Ship (pos.x, pos.y, pos.z, ship.getOrientation());
-    predictionShip.sprite = sprites.ships.create(0, 0, 'playership');
-    if (players[socket.id].status != "sunk") {
-        drawPredictionShip();
-        calcPredictionValidMoves();
+    if (typeof ship != "undefined"){
+        let pos = ship.getPosition();
+        predictionShip = new Ship (pos.x, pos.y, pos.z, ship.getOrientation());
+        predictionShip.sprite = sprites.ships.create(0, 0, 'playership');
+        if (players[socket.id].status != "sunk") {
+            drawPredictionShip();
+            calcPredictionValidMoves();
+        }
     }
+    attackedTiles = [];
 }
 
 function drawPredictionShip() {
