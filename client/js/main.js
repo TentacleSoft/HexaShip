@@ -13,6 +13,9 @@ if (availableWidth / availableHeight > canvasRatio) {
 const SCALE = canvasWidth / 900;
 const OFFSET_X = 100 * SCALE;
 
+const blueCellColor = 0x0000ff;
+const redCellColor = 0xff0000;
+
 //Game stuff
 var socket;
 var players = {};
@@ -21,7 +24,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
     function preload () {
         //game assets
-        game.load.image('cell', '../assets/hexagon_border_blue.png');
+        game.load.image('cell', '../assets/hexagon_border_white.png');
         game.load.image('enemyship', '../assets/enemyship.png');
         game.load.image('allyship', '../assets/allyship.png');
         game.load.image('playership', '../assets/playership.png');
@@ -78,6 +81,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 let pixels2d = position2dToPixels2(position2d.x, position2d.y);
 
                 let cell = sprites.grid.create(pixels2d.x, pixels2d.y, 'cell');
+                cell.tint = blueCellColor;
                 cell.scale.setTo(SCALE);
                 setAnchorMid(cell);
                 addSpriteToGrid(grid, newCell.x, newCell.y, newCell.z, cell);
@@ -86,6 +90,18 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
             topCell = movingDown ? topCell.move_towards(Orientation.DR, 1) : topCell.move_towards(Orientation.UR, 1);
             movingDown = !movingDown;
+        }
+    }
+
+    function makeFuckingGridBlueAgain() {
+        for (let i in grid) {
+            let gridi = grid[i];
+            for (let j in gridi){
+                let gridj = gridi[j];
+                for (let k in gridj) {
+                    gridj[k].tint = blueCellColor;
+                }
+            }
         }
     }
 
@@ -127,6 +143,27 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         var missile = sprites.ui.create(canvasWidth - OFFSET_X, OFFSET_X, 'misile_button');
         setAnchorMid(missile);
         missile.scale.setTo(SCALE);
+
+        missile_border.inputEnabled = true;
+        missile_border.input.useHandCursor = true;
+        missile_border.events.onInputDown.add(onClickAttack, this);
+
+        missile.inputEnabled = true;
+        missile.input.useHandCursor = true;
+        missile.events.onInputDown.add(onClickAttack, this);
+    }
+
+    function onClickAttack() {
+        let player = players[socket.id];
+        let position = new HexPosition(player.position.x, player.position.y, player.position.z);
+        let attack_line = position.get_front_side_lines(player.orientation,3);
+
+        for (let i = 0; i < attack_line.length; i++) {
+            for (let j = 0; j < attack_line[i].length; j++) {
+                let position = attack_line[i][j];
+                grid[position.x][position.y][position.z].tint = redCellColor;
+            }
+        }
     }
 
 
@@ -189,6 +226,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
             players[p].sprite.angle = (players[p].orientation - 1) * 60;
         };
+        makeFuckingGridBlueAgain();
     }
 
 
