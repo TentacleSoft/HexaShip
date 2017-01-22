@@ -209,7 +209,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
     function renderShips() {
         for (let p in players) {
-            if (typeof players[p].sprite === "undefined"){
+            if (typeof players[p].sprite === "undefined" && players[p].status != "sunk"){
                 if (players[p].team === "you"){
                     players[p].sprite = sprites.ships.create(0, 0, 'playership');
                 }
@@ -223,13 +223,19 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 players[p].sprite.scale.setTo(SCALE);
             }
 
-            let player_hex_position = new HexPosition(players[p].position.x, players[p].position.y, players[p].position.z);
-            let player_2d_position = player_hex_position.position2d();
-            player_2d_position = position2DToPixels(player_2d_position.x,player_2d_position.y);
-            players[p].sprite.x = player_2d_position.x;
-            players[p].sprite.y = player_2d_position.y;
+            if (players[p].status != "sunk") {
+                let player_hex_position = new HexPosition(players[p].position.x, players[p].position.y, players[p].position.z);
+                let player_2d_position = player_hex_position.position2d();
+                player_2d_position = position2dToPixels2(player_2d_position.x,player_2d_position.y);
+                players[p].sprite.x = player_2d_position.x;
+                players[p].sprite.y = player_2d_position.y;
 
-            players[p].sprite.angle = (players[p].orientation - 1) * 60;
+                players[p].sprite.angle = (players[p].orientation - 1) * 60;
+            }
+            else if (typeof players[p].sprite !== "undefined") {
+                players[p].sprite.destroy();
+                delete players[p].sprite;
+            }
         };
         makeFuckingGridBlueAgain();
     }
@@ -254,6 +260,7 @@ function createConnection() {
             players[socketId].team = player.team;
             players[socketId].position = player.position;
             players[socketId].orientation = player.orientation;
+            players[socketId].status = player.status;
         });
         renderShips();
     });
