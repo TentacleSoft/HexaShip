@@ -37,6 +37,8 @@ var validMoves = {};
 var attackHex2Dir = {};
 var attackDir2Hex = {};
 
+var attackedTiles = [];
+
 var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 
@@ -162,6 +164,11 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                     gridj[k].alpha = 0.75;
                 }
             }
+        }
+        for (let i = 0; i < attackedTiles.length; i++) {
+            let pos = attackedTiles[i];
+            grid[pos.x][pos.y][pos.z].tint = redCellColor;
+            grid[pos.x][pos.y][pos.z].alpha = 1;
         }
         if (game_status == WAITFORMOVES){
             showValidMoves();
@@ -331,8 +338,10 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             if (game_status == WAITFORATTACK) {
                 if (typeof attackHex2Dir[hexpos.x] != "undefined" &&
                     typeof attackHex2Dir[hexpos.x][hexpos.y] != "undefined" &&
-                    typeof attackHex2Dir[hexpos.x][hexpos.y][hexpos.z] != "undefined"){
+                    typeof attackHex2Dir[hexpos.x][hexpos.y][hexpos.z] != "undefined" &&
+                    typeof attackHex2Dir[hexpos.x][hexpos.y][hexpos.z][0] != "undefined"){
                     let dir = attackHex2Dir[hexpos.x][hexpos.y][hexpos.z];
+
                     for (let i = 0; i < attackDir2Hex[dir][0].length; i++){
                         let atPos = attackDir2Hex[dir][0][i];
                         grid[atPos.x][atPos.y][atPos.z].alpha = 1;
@@ -390,12 +399,18 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     }
 
     function renderShips() {
+        attackedTiles = [];
         for (let p in players) {
             if( players[p].status == "shooting"){
-                console.log("player is shooting towards "+players[p].shoot_orientation);
+                var position = new HexPosition(players[p].position.x,players[p].position.y,players[p].position.z);
+                var atts = position.get_line_towards(players[p].shoot_orientation, 3);
+                for (let i = 0; i < atts.length; i++){
+                    attackedTiles.push(atts[i]);
+                }
+                //console.log("player is shooting towards "+players[p].shoot_orientation);
             }
             if (typeof players[p].sprite === "undefined" && players[p].status != "sunk"){
-                if (players[p].team === "you"){
+                if (players[p].team === "you" && players[p].status != "sunk"){
                     players[p].sprite = sprites.ships.create(0, 0, 'playership');
                 }
                 else if (players[p].team === "enemy") {
@@ -497,8 +512,10 @@ function resetActions() {
     let pos = ship.getPosition();
     predictionShip = new Ship (pos.x, pos.y, pos.z, ship.getOrientation());
     predictionShip.sprite = sprites.ships.create(0, 0, 'playership');
-    drawPredictionShip();
-    calcPredictionValidMoves();
+    if (players[socket.id].status != "sunk") {
+        drawPredictionShip();
+        calcPredictionValidMoves();
+    }
 }
 
 function drawPredictionShip() {
@@ -536,8 +553,6 @@ function calcPredictionValidMoves() {
     else if (predictionShip !== null) {
             let valid = predictionShip.get_valid_moves();
             validMoves = {};
-            console.log("calc valid moves");
-            console.log(valid);
             for (let i = 0; i < valid.length; i++) {
                 if (typeof validMoves[valid[i].x] == "undefined") {
                     validMoves[valid[i].x] = {};

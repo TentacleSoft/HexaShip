@@ -2,10 +2,10 @@ class Health  {
     constructor() {
         this.CUSTOM_SCALE = 1;
 
-        this.xOffset = 20 * SCALE;
+        this.xOffset = -30 * SCALE;
         this.yOffset = -50 * SCALE;
 
-        this.maxWidth = this.CUSTOM_SCALE * 20 * SCALE; // TODO this is hardcoded, use scale
+        this.maxWidth = this.CUSTOM_SCALE * 60 * SCALE; // TODO this is hardcoded, use scale
         this.maxHealth = 3; // TODO hardcoded, get from server or something
         this.currentHealth = this.maxHealth;
         let barHeight = 10 * SCALE * this.CUSTOM_SCALE;
