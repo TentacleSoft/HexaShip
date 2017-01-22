@@ -52,6 +52,9 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
         // TODO give attribution http://www.dafont.com/upheaval.font
         game.load.bitmapFont('font', 'assets/bitmapFonts/font.png', 'assets/bitmapFonts/font.fnt');
+
+        // TODO give attribution https://www.freesound.org/people/baefild/sounds/91293/
+        game.load.audio('cannon', ['assets/sound/cannon.mp3']);
     }
 
     var cursors;
@@ -136,6 +139,8 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     }
 
     function showAttackTiles() {
+        game.sound.play('cannon');
+
         let player = players[socket.id];
         let position = new HexPosition(player.position.x, player.position.y, player.position.z);
         let attack_line = position.get_front_side_lines(player.orientation,3);
@@ -147,6 +152,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 grid[position.x][position.y][position.z].alpha = 0.9;
             }
         }
+
         //socket.emit("shoot",turn_left(player.orientation));
         //socket.emit("shoot",turn_right(player.orientation));
     }
