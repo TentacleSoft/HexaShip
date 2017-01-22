@@ -34,6 +34,8 @@ const WAITFORATTACK = 2;
 var game_status = WAITFORMOVES;
 
 var validMoves = {};
+var attackHex2Dir = {};
+var attackDir2Hex = {};
 
 var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
@@ -89,7 +91,6 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         let hexClick = pixelstoHexPosition(game.input.x,game.input.y);
         if (predictionShip !== null){
             if (game_status == WAITFORMOVES) {
-                console.log(validMoves);
                 if (typeof validMoves[hexClick.x] != "undefined" &&
                     typeof validMoves[hexClick.x][hexClick.y] != "undefined" &&
                     typeof validMoves[hexClick.x][hexClick.y][hexClick.z] != "undefined"){
@@ -100,6 +101,16 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                         addActionDone();
                         calcPredictionValidMoves();
                 }       
+            }
+            else if (game_status == WAITFORATTACK) {
+                if (typeof attackHex2Dir[hexClick.x] != "undefined" &&
+                    typeof attackHex2Dir[hexClick.x][hexClick.y] != "undefined" &&
+                    typeof attackHex2Dir[hexClick.x][hexClick.y][hexClick.z] != "undefined"){
+                    socket.emit("shoot",attackHex2Dir[hexClick.x][hexClick.y][hexClick.z]);
+                    addActionDone();
+                    calcPredictionValidMoves();
+                    game_status = WAITFORMOVES;
+                }
             }
         }
     }
@@ -169,24 +180,51 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             }
         }
     }
+    function showAttackTiles(){
+        if (predictionShip !== null && canActionBeDone()) {
+            for (dir in attackDir2Hex) {
+                for (let i = 0; i<attackDir2Hex[dir][0].length; i++){
+                    grid[attackDir2Hex[dir][0][i].x][attackDir2Hex[dir][0][i].y][attackDir2Hex[dir][0][i].z].tint = redCellColor;
+                }
+            }
+        }
+    }
 
-    function showAttackTiles() {
+    function calcAttackTiles() {
         game.sound.play('cannon');
 
-        let player = players[socket.id];
-        let position = new HexPosition(player.position.x, player.position.y, player.position.z);
-        let attack_line = position.get_front_side_lines(player.orientation,3);
+        if (predictionShip !== null) {
 
-        for (let i = 0; i < attack_line.length; i++) {
-            for (let j = 0; j < attack_line[i].length; j++) {
-                let position = attack_line[i][j];
-                grid[position.x][position.y][position.z].tint = redCellColor;
-                grid[position.x][position.y][position.z].alpha = 0.75;
-            }
+
+            //this works with magic
+            attackDir2Hex = {};
+            //left 1
+            attackDir2Hex[turn_left(predictionShip.getOrientation(),1)] = predictionShip.getPosition().get_lines_from_orientations([turn_left(predictionShip.getOrientation(),1)],3);
+            attackDir2Hex[turn_left(predictionShip.getOrientation(),2)] = predictionShip.getPosition().get_lines_from_orientations([turn_left(predictionShip.getOrientation(),2)],3);
+            attackDir2Hex[turn_right(predictionShip.getOrientation(),1)] = predictionShip.getPosition().get_lines_from_orientations([turn_right(predictionShip.getOrientation(),1)],3);
+            attackDir2Hex[turn_right(predictionShip.getOrientation(),2)] = predictionShip.getPosition().get_lines_from_orientations([turn_right(predictionShip.getOrientation(),2)],3);
+
+            calcAttackHex2Dir(turn_left(predictionShip.getOrientation(),1));
+            calcAttackHex2Dir(turn_left(predictionShip.getOrientation(),2));
+            calcAttackHex2Dir(turn_right(predictionShip.getOrientation(),1));
+            calcAttackHex2Dir(turn_right(predictionShip.getOrientation(),2));
         }
 
         //socket.emit("shoot",turn_left(player.orientation));
         //socket.emit("shoot",turn_right(player.orientation));
+    }
+
+    function calcAttackHex2Dir(orientation) {
+        let valid = attackDir2Hex[orientation][0]
+        for (let i = 0; i < valid.length; i++){
+            if (typeof attackHex2Dir[valid[i].x] == "undefined") {
+                    attackHex2Dir[valid[i].x] = {};
+                }
+                if (typeof attackHex2Dir[valid[i].x][valid[i].y] == "undefined") {
+                    attackHex2Dir[valid[i].x][valid[i].y] = {};
+                }
+                attackHex2Dir[valid[i].x][valid[i].y][valid[i].z] = orientation;
+        }
     }
 
     function addSpriteToGrid(grid,x,y,z,sprite){
@@ -248,6 +286,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
     function onClickAttack() {
         if (game_status == WAITFORMOVES) {
+            calcAttackTiles();
             game_status = WAITFORATTACK;
         }
         else if (game_status == WAITFORATTACK) {
@@ -289,6 +328,17 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
         if(hexpos.within_box(gridWidth,gridHeight)){
 
 			grid[hexpos.x][hexpos.y][hexpos.z].alpha = 1;
+            if (game_status == WAITFORATTACK) {
+                if (typeof attackHex2Dir[hexpos.x] != "undefined" &&
+                    typeof attackHex2Dir[hexpos.x][hexpos.y] != "undefined" &&
+                    typeof attackHex2Dir[hexpos.x][hexpos.y][hexpos.z] != "undefined"){
+                    let dir = attackHex2Dir[hexpos.x][hexpos.y][hexpos.z];
+                    for (let i = 0; i < attackDir2Hex[dir][0].length; i++){
+                        let atPos = attackDir2Hex[dir][0][i];
+                        grid[atPos.x][atPos.y][atPos.z].alpha = 1;
+                    }
+                }
+            }
         }
 
         renderActionsLeft();
