@@ -155,7 +155,6 @@ class HexPosition {
         }
         return this;
 
-
 	}
 	move_towards_unrestricted(orientation,distance){
 		let hexPosition = HexPosition.unitary_vector(orientation);
@@ -214,7 +213,11 @@ class HexPosition {
 		return [this.get_line_towards(turn_left(orientation,2),length),this.get_line_towards(turn_right(orientation,2),length)];
 	}
 
-	within_box(boardWidth,boardHeight){
+
+	within_box(){
+		return this.within_given_box(MAX_WIDTH,MAX_HEIGHT)
+    }
+	within_given_box(boardWidth,boardHeight){
 	    let oddColumn = this.x%2 == 1;
 	    let topCell = new HexPosition(0,0,0);
 	    if(oddColumn){

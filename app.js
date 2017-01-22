@@ -84,17 +84,18 @@ function processOrder(playerId, order) {
     if(players[playerId].ship.status == "sunk"){
         return;
     }
+	var ships = [];
+	for (var id in players) {
+		ships.push(players[id].ship);
+	}
     switch (order.type) {
         case 'move':
             // TODO validate orientation and movement
-            players[playerId].ship.move_towards(order.orientation);
+            players[playerId].ship.move_towards(order.orientation,ships);
             players[playerId].ship.setOrientation(order.orientation);
             break;
         case 'shoot':
-			var ships = [];
-			for (var id in players) {
-				ships.push(players[id].ship);
-			}
+
 			players[playerId].ship.shoot(order.orientation, ships);
             break;
         default:
