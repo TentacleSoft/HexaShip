@@ -78,7 +78,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
             let newCell = topCell.copy();
             for (let row = 0; row < gridHeight; row++) {
                 let position2d = newCell.position2d();
-                let pixels2d = position2dToPixels2(position2d.x, position2d.y);
+                let pixels2d = position2DToPixels(position2d.x, position2d.y);
 
                 let cell = sprites.grid.create(pixels2d.x, pixels2d.y, 'cell');
                 cell.tint = blueCellColor;
@@ -164,14 +164,11 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 grid[position.x][position.y][position.z].tint = redCellColor;
             }
         }
-        socket.emit("shoot",turnLeft(player.orientation));
-        socket.emit("shoot",turnRight(player.orientation));
+        socket.emit("shoot",turn_left(player.orientation));
+        socket.emit("shoot",turn_right(player.orientation));
     }
 
 
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
 
 
     var sleepEnds = 0;
@@ -202,7 +199,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
     	sprite.anchor.y = 0.5;
     }
 
-    function position2dToPixels2(hex_x,hex_y){
+    function position2DToPixels(hex_x,hex_y){
 		let pix_coords = {},
             offset = 50;
 		pix_coords.x = SCALE * (Cell.HEIGHT * hex_x) + 50 * SCALE + offset;
@@ -228,7 +225,7 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
 
             let player_hex_position = new HexPosition(players[p].position.x, players[p].position.y, players[p].position.z);
             let player_2d_position = player_hex_position.position2d();
-            player_2d_position = position2dToPixels2(player_2d_position.x,player_2d_position.y);
+            player_2d_position = position2DToPixels(player_2d_position.x,player_2d_position.y);
             players[p].sprite.x = player_2d_position.x;
             players[p].sprite.y = player_2d_position.y;
 

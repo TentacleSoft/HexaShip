@@ -1,3 +1,5 @@
+CANNON_RANGE = 3
+
 class Ship {
     constructor(x, y, z) {
         this.position = new HexPosition(x, y, z);
@@ -6,6 +8,10 @@ class Ship {
 
     setOrientation(orientation) {
         this.orientation = orientation;
+    }
+
+    get_all_canons(){
+        return pos.get_back_side_lines(this.orientation,CANNON_RANGE) + pos.get_front_side_lines(this.orientation,CANNON_RANGE)
     }
 
     move_towards(orientation) {

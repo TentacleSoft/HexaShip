@@ -30,7 +30,6 @@ var players = {};
 
 io.on('connection',function (socket) {
     console.log('Connected: ' + socket.id);
-    // players[socket.id] = new Player (socket);
 
     players[socket.id] = new Player(new Ship(0, 0, 0), socket);
 
@@ -40,13 +39,9 @@ io.on('connection',function (socket) {
         players[socket.id].orders.push({type: 'move', orientation: orientation});
     });
 
-    socket.on('shoot', function () {
-        var ships = [];
-        for (var id in players) {
-            ships.push(players[id].ship);
-        }
+    socket.on('shoot', function (orientation) {
+		players[socket.id].orders.push({type: 'shoot', orientation: orientation});
 
-        players[socket.id].ship.shoot(orientation, ships);
     });
 
     socket.on('disconnect', function () {
@@ -59,7 +54,8 @@ io.on('connection',function (socket) {
     });
 });
 
-const turnDuration = 10;
+const turnDuration = 5;
+
 
 var turn = function () {
     notifyTurnStart();
@@ -85,15 +81,25 @@ function notifyTurnStart() {
 }
 
 function processOrder(playerId, order) {
+    if(players[playerId].ship.status == "sunk"){
+        return;
+    }
     switch (order.type) {
         case 'move':
             // TODO validate orientation and movement
             players[playerId].ship.move_towards(order.orientation);
             players[playerId].ship.setOrientation(order.orientation);
+            break;
         case 'shoot':
-            console.log('TODO process shoot order');
+			var ships = [];
+			for (var id in players) {
+				ships.push(players[id].ship);
+			}
+			players[playerId].ship.shoot(order.orientation, ships);
+            break;
         default:
             console.log('Undefined order type', order);
+            break;
     }
 }
 
@@ -107,6 +113,7 @@ var sendGameState = function () {
                 nick: 'Cacatua ' + player.socket.id,
                 orientation: player.ship.orientation,
                 position: player.ship.position,
+				status: player.ship.status,
                 team: i === player.socket.id ? 'you' : 'enemy'
             });
         }

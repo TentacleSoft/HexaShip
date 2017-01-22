@@ -9,6 +9,7 @@ class Ship {
         this.position = new HexPosition(x, y, z);
         this.orientation = Orientation.U;
         this.health = HEALTH;
+        this.status = "alive";
     }
 
     setOrientation(orientation) {
@@ -20,6 +21,10 @@ class Ship {
 	}
     hurt(damage){
         this.health -= damage;
+        if(this.health <= 0){
+			this.status = "sunk";
+			console.log("ship sunk!")
+        }
     }
 
     getPosition() {
@@ -31,25 +36,30 @@ class Ship {
     }
 
     shoot(orientation,ships){
-        shipToHurt = null;
-        minimumDistance = 1000;
+        var shipToHurt = false;
+        var minimumDistance = 1000;
+        var self = this;
         ships.forEach(function(ship){
-            if(this.position.straight_orientation_to(ship.position) == orientation){
-                let distance = this.position.distance_to(ship.position)
+            console.log("shooting! to "+orientation);
+            console.log(ship);
+            if(self.position.straight_orientation_to(ship.position) == orientation){
+                let distance = self.position.distance_to(ship.position)
                 if(distance < minimumDistance){
                     shipToHurt = ship;
-                    minumumDistance = distance;
+					minimumDistance = distance;
                 }
             }
 
         });
         if(shipToHurt){
+            console.log("player hurt! ");
             if(minimumDistance == 1) {
                 shipToHurt.hurt(2);
 			}else if(minimumDistance < 4) {
                 shipToHurt.hurt(1);
             }
         }
+
     }
 }
 

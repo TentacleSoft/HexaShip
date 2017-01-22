@@ -15,7 +15,7 @@ class OrderQueue {
         // Limit to 1 shoot at a time
         if (order.type === 'shoot') {
             for (var i in this.orders) {
-                if (orders[i].type === 'shoot') {
+                if (this.orders[i].type === 'shoot') {
                     return;
                 }
             }

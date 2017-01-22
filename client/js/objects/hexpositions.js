@@ -14,6 +14,7 @@ var MAX_WIDTH = 9;
 var MAX_HEIGHT = 4;
 
 function turn_right(orientation,factor){
+	if(!factor) factor = 1;
     let new_orientation = orientation + factor;
     while(new_orientation > 6){
 		new_orientation -= 6;
@@ -25,6 +26,7 @@ function turn_right(orientation,factor){
 }
 
 function turn_left(orientation,factor){
+    if(!factor) factor = 1;
     return turn_right(orientation,-factor);
 }
 
@@ -158,8 +160,6 @@ class HexPosition {
 	move_towards_unrestricted(orientation,distance){
 		let hexPosition = HexPosition.unitary_vector(orientation);
 		hexPosition = hexPosition.product(distance);
-
-
 
 		let newPosition = hexPosition.add(this);
 
