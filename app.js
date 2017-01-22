@@ -59,8 +59,12 @@ io.on('connection',function (socket) {
     });
 });
 
+const turnDuration = 10;
+
 var turn = function () {
     console.log('Processing turn...');
+
+    notifyTurnStart();
 
     for (var step = 0; step < 3; step++) { // TODO use OrderQueue.size
         setTimeout(function () {
@@ -76,6 +80,12 @@ var turn = function () {
         }, step * 1000);
     }
 };
+
+function notifyTurnStart() {
+    for (var id in players) {
+        players[id].socket.emit("turn_start", turnDuration);
+    }
+}
 
 function processOrder(playerId, order) {
     switch (order.type) {
@@ -108,5 +118,5 @@ var sendGameState = function () {
     }
 };
 
-setInterval(turn, 10000);
+setInterval(turn, turnDuration * 1000);
 setInterval(sendGameState, 1000);
