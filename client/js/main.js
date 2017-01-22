@@ -164,6 +164,8 @@ var game = new Phaser.Game(availableWidth, availableHeight, Phaser.AUTO, '', { p
                 grid[position.x][position.y][position.z].tint = redCellColor;
             }
         }
+        socket.emit("shoot",turnLeft(player.orientation));
+        socket.emit("shoot",turnRight(player.orientation));
     }
 
 
