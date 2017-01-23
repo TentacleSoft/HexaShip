@@ -1,15 +1,25 @@
-class Health  {
-    constructor() {
-        this.CUSTOM_SCALE = 1;
+import { Phaser } from 'phaser';
+import { SCALE } from './main';
 
+const CUSTOM_SCALE = 1;
+
+export class Health {
+    currentHealth: number;
+    xOffset: number;
+    yOffset: number;
+    maxWidth: number;
+    maxHealth: number;
+    bar;
+
+    constructor() {
         this.xOffset = -30 * SCALE;
         this.yOffset = -50 * SCALE;
 
-        this.maxWidth = this.CUSTOM_SCALE * 60 * SCALE; // TODO this is hardcoded, use scale
+        this.maxWidth = CUSTOM_SCALE * 60 * SCALE; // TODO this is hardcoded, use scale
         this.maxHealth = 3; // TODO hardcoded, get from server or something
         this.currentHealth = this.maxHealth;
-        let barHeight = 10 * SCALE * this.CUSTOM_SCALE;
-        this.bar = new Phaser.Rectangle(0, 0, this.maxWidth * this.CUSTOM_SCALE, barHeight);
+        let barHeight = 10 * SCALE * CUSTOM_SCALE;
+        this.bar = new Phaser.Rectangle(0, 0, this.maxWidth * CUSTOM_SCALE, barHeight);
 
     }
 
@@ -35,8 +45,8 @@ class Health  {
         left = 0 => green
 
          */
-        if (left > 0.5) red = 256* 256 * Math.trunc((1 - left) * 2 * 255);
-        else green = 256 * Math.trunc(255*left * 2);
+        if (left > 0.5) red = 256 * 256 * Math.floor((1 - left) * 2 * 255);
+        else green = 256 * Math.floor(255 * left * 2);
         graphics.beginFill(red + green);
         graphics.drawPolygon([this.bar.bottomLeft, this.bar.bottomRight, this.bar.topRight, this.bar.topLeft]);
         graphics.endFill();
