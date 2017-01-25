@@ -1,21 +1,25 @@
-const size = 3;
+import { Shoot, Order } from './order';
 
-class OrderQueue {
+export const Size = 3;
+
+export class OrderQueue {
+    orders: Order[];
+
     constructor() {
         this.orders = [];
     }
 
-    push(order) {
+    push(order: Order) {
         // TODO avoid pushing orders during turn processing?
 
-        if (this.orders.length >= size) {
+        if (this.orders.length >= Size) {
             return;
         }
 
         // Limit to 1 shoot at a time
-        if (order.type === 'shoot') {
+        if (order instanceof Shoot) {
             for (var i in this.orders) {
-                if (this.orders[i].type === 'shoot') {
+                if (this.orders[i] instanceof Shoot) {
                     return;
                 }
             }
@@ -24,9 +28,7 @@ class OrderQueue {
         this.orders.push(order);
     }
 
-    pop() {
+    pop(): Order {
         return this.orders.shift();
     }
 }
-
-module.exports = OrderQueue;
